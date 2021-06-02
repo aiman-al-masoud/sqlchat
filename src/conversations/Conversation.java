@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.FileIO;
-import messages.Message;
 import users.User;
 
 public class Conversation extends File{

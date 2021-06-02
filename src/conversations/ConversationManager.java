@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import messages.Message;
 import users.User;
 
 public class ConversationManager {

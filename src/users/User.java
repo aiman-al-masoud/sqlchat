@@ -3,8 +3,9 @@ package users;
 import java.util.ArrayList;
 
 import conversations.ConversationManager;
-import messages.Message;
-import messages.MessageDAO;
+import conversations.Message;
+import daos.MessageDAO;
+import daos.UserDAO;
 
 public class User {
 

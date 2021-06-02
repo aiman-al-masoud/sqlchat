@@ -2,7 +2,7 @@ package main;
 
 import conversations.Conversation;
 import conversations.ConversationManager;
-import messages.Message;
+import conversations.Message;
 
 public class ConversationsTester {
 

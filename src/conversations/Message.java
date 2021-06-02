@@ -1,4 +1,4 @@
-package messages;
+package conversations;
 
 import java.util.Date;
 

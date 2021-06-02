@@ -1,4 +1,4 @@
-package users;
+package daos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import io.ConnectionToDB;
+import users.User;
 
 
 public class UserDAO {
@@ -74,7 +75,7 @@ public class UserDAO {
 			sql = "CREATE TABLE {0} ( \n"
 					+ "`timestamp` BIGINT,\n"
 					+ "`senderId` VARCHAR(30),\n"
-					+ "`message` VARCHAR(160),\n"
+					+ "`message` VARCHAR(5000),\n"
 					+ "CONSTRAINT primaryKey PRIMARY KEY (`timestamp`, `senderId`)\n"
 					+ ")";
 			Statement statement = connection.createStatement();

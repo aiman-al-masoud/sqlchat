@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 import conversations.Conversation;
 import conversations.ConversationManager;
-import messages.Message;
+import conversations.Message;
 
 public class Shell implements UserListener{
 

@@ -1,4 +1,4 @@
-package messages;
+package daos;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
+import conversations.Message;
 import io.ConnectionToDB;
 import stackTracker.CallStackTracker;
 import users.User;
