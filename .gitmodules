@@ -1,0 +1,3 @@
+[submodule "cheap_security"]
+	path = cheap_security
+	url = https://github.com/aiman-al-masoud/cheap_security
