@@ -1,8 +1,8 @@
 package main;
 
-import conversations.Conversation;
-import conversations.ConversationManager;
-import conversations.Message;
+import model.conversations.Conversation;
+import model.conversations.ConversationManager;
+import model.conversations.Message;
 
 public class ConversationsTester {
 

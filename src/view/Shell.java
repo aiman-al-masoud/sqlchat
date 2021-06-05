@@ -1,15 +1,14 @@
 package view;
 
-import users.User;
-import users.User.UserListener;
-import users.UserManager;
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import conversations.Conversation;
-import conversations.ConversationManager;
-import conversations.Message;
+import model.conversations.Conversation;
+import model.conversations.ConversationManager;
+import model.conversations.Message;
+import model.users.User;
+import model.users.UserManager;
+import model.users.User.UserListener;
 
 public class Shell implements UserListener{
 
@@ -17,19 +16,24 @@ public class Shell implements UserListener{
 	Conversation currentConversation;
 
 
+	
+	User localUser;
+	
+	
+	Scanner scanner;
+	
+	
 	public void startShell(){
 
-		Scanner scanner = new Scanner(System.in);
+		scanner = new Scanner(System.in);
 
 		//get the current user 
-		User localUser = UserManager.getInstance().getLocalUser();
+		localUser = UserManager.getInstance().getLocalUser();
 
+		
 		//if no user is currently saved, ask for a userId
 		if(localUser==null) {
-			System.out.println("Looks like this is the first time you log in... Pleas enter your username:");
-			String userId =  scanner.nextLine();
-			localUser = new User(userId);
-			UserManager.getInstance().saveLocalUser(localUser);	
+			setLocalUser();
 		}
 
 
@@ -39,6 +43,11 @@ public class Shell implements UserListener{
 			//prompt user to enter their password
 			System.out.println("Please enter your password to log in:");
 			passwordAttempt = scanner.nextLine();
+			
+			if(passwordAttempt.toUpperCase().trim().equals("LOGOUT")) {
+				this.setLocalUser();
+			}
+			
 		}while(!localUser.logIn(passwordAttempt));
 
 
@@ -71,7 +80,11 @@ public class Shell implements UserListener{
 			if(command.toUpperCase().trim().equals("EXIT")) {
 				System.exit(0);
 			}
-
+			
+			
+			
+			
+			
 			//if the user is in a conversation, the "command" is just a message, unless it's an end-conversation command
 			if(isInConversation()) {
 
@@ -82,7 +95,7 @@ public class Shell implements UserListener{
 				}
 
 				//send a message
-				localUser.sendMessage(currentConversation.toString(), command);
+				localUser.sendMessage( command);
 				continue;
 			}
 
@@ -91,12 +104,18 @@ public class Shell implements UserListener{
 			if(command.toUpperCase().trim().equals("LS")) {
 				listConversations();
 			}
+			
 
 			//if the command is to open a conversation, print all of its previous messages
 			if(command.split("\\s+")[0].toUpperCase().trim().equals("OPEN")) {
 				openConversation(command.split("\\s+")[1].trim());
 			}
 
+			
+			
+			
+			
+			
 
 		}
 
@@ -116,11 +135,14 @@ public class Shell implements UserListener{
 	public void openConversation(String convName) {
 
 		currentConversation = ConversationManager.getInstance().getConversation(convName);
-
+				
 		if(currentConversation==null) {
 			System.out.println("sorry, this conversation doesn't exist...");
 			return;
 		}
+		
+		localUser.enterConversation(currentConversation);
+
 
 		for(Message msg : currentConversation.getMessages()) {
 			System.out.println(msg.prettyToString());
@@ -180,6 +202,15 @@ public class Shell implements UserListener{
 
 
 
+	
+	
+	public void setLocalUser() {
+		UserManager.getInstance().saveLocalUser(null);	
+		System.out.println("Looks like this is the first time you log in... Please enter your username:");
+		String userId =  scanner.nextLine();
+		localUser = new User(userId);
+		UserManager.getInstance().saveLocalUser(localUser);	
+	}
 
 
 
@@ -194,6 +225,7 @@ public class Shell implements UserListener{
 			System.out.println(message.prettyToString());
 		}
 	}
+	
 
 
 

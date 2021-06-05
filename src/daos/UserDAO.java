@@ -9,7 +9,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import io.ConnectionToDB;
-import users.User;
+import model.users.User;
 
 
 public class UserDAO {
@@ -100,11 +100,11 @@ public class UserDAO {
 		try {
 
 			connection = ConnectionToDB.startConnection();
-			
+
 			String sql = "select `password` from `Users` where id=?";
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setString(1, userId);
-			
+
 
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -115,6 +115,7 @@ public class UserDAO {
 			}
 
 			if(passwordAttempt.equals(password)) {
+				//registerNewPublicKey(user);
 				return true;
 			}
 
@@ -126,6 +127,52 @@ public class UserDAO {
 
 		return false;
 	}
+
+
+	public static void registerNewPublicKey(User user) {
+
+		connection = ConnectionToDB.startConnection();
+
+
+
+		try {
+			Statement statement  = connection.createStatement();
+
+			statement.executeUpdate(" UPDATE Users\n"
+					+ "SET publicKey = \""+user.getPublicKey()+"\"\n"
+					+ "WHERE id = \""+user.getId()+"\"");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+
+
+	public static String getPublicKey(String userId) {
+		connection = ConnectionToDB.startConnection();
+
+		try {
+			Statement statement  = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery("select publicKey from Users where id = \""+userId+"\"");
+
+			String publicKey;
+			while(resultSet.next()) {
+				publicKey = resultSet.getString(1);
+				return publicKey;
+			}
+
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+
+		return null;
+	}
+
+
+
 
 
 

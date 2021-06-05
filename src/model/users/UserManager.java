@@ -1,4 +1,4 @@
-package users;
+package model.users;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +67,11 @@ public class UserManager {
 	 */
 	public void saveLocalUser(User user){
 		localUser = user;
-		FileIO.write(localUserFile.getPath(), localUser.getId());
+		try {
+			FileIO.write(localUserFile.getPath(), localUser.getId());
+		}catch(NullPointerException e) {
+			FileIO.write(localUserFile.getPath(), "");
+		}
 	}
 
 	

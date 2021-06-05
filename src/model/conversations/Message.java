@@ -1,4 +1,4 @@
-package conversations;
+package model.conversations;
 
 import java.util.Date;
 
@@ -52,6 +52,10 @@ public class Message {
 	}
 
 
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	
 
 
 }

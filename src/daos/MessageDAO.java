@@ -8,10 +8,9 @@ import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
-import conversations.Message;
 import io.ConnectionToDB;
-import stackTracker.CallStackTracker;
-import users.User;
+import model.conversations.Message;
+import model.users.User;
 
 public class MessageDAO {
 
@@ -25,17 +24,13 @@ public class MessageDAO {
 	 * @param sender
 	 * @param message
 	 */
-	public static void messageUser(User recipient, User sender, String message) {
+	public static void messageUser(String recipient, User sender, String message) {
 
-		//check call stack security
-		if(!callStackOk()) {
-			return;
-		}
 		
 
 		String senderId = sender.getId();
 		long unixTime = System.currentTimeMillis(); 
-		String recipientId = recipient.getId();
+		String recipientId = recipient;
 
 
 		//if the recipientId contains spaces, stop everything as it could be a sql injection
@@ -70,12 +65,7 @@ public class MessageDAO {
 	 * @return
 	 */
 	public static ArrayList<Message> pullMessages(User recipient) {
-		
-		//check call stack security
-		if(!callStackOk()) {
-			return null;
-		}
-		
+	
 
 		ArrayList<Message> result = new ArrayList<Message>();
 
@@ -111,17 +101,6 @@ public class MessageDAO {
 	}
 
 
-	/**
-	 * Check the security of the call stack
-	 * @return
-	 */
-	private static boolean callStackOk() {
-		//if I'm not getting called from users.User, then it's probably bad...
-		if(CallStackTracker.callStackContains("users.User")) {
-			return true;
-		}
-		return false;
-	}
 
 
 

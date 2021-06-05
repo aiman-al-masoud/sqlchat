@@ -1,11 +1,11 @@
-package conversations;
+package model.conversations;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import io.FileIO;
-import users.User;
+import model.users.User;
 
 public class Conversation extends File{
 
@@ -13,13 +13,16 @@ public class Conversation extends File{
 	public static File conversationsDir = new File("res"+File.separator+"conversations");
 	ArrayList<Message> messages;
 	User localUser;
+	
+	
 	User otherUser;
 
 
 	public Conversation(User otherUser) {
 		super(conversationsDir.getPath()+File.separator+otherUser.getId());
 		
-		this.otherUser = otherUser;
+		this.otherUser  = otherUser;
+		
 		messages = new ArrayList<Message>();
 		if(!exists()) {
 			create();
@@ -95,9 +98,13 @@ public class Conversation extends File{
 
 	@Override
 	public String toString() {
+		
+		
 		return otherUser.getId();
 	}
 
+	
+	
 
 
 	/**
@@ -106,19 +113,13 @@ public class Conversation extends File{
 	 */
 	public static void main(String[] args) {
 
-		Conversation conversation = new Conversation(new User("mujaddara"));
-		
-		//ArrayList<Message> messages = new ArrayList<Message>();
-		//messages.add(new Message(10, "capra", "ciao"));
-		//conversation.appendMessages(messages);
-		
-		for(Message message : conversation.getMessages()) {
-			System.out.println(message.prettyToString());
-		}
-		
-		
 	}
 
+	
+	
+	
+	
+	
 
 
 

@@ -1,10 +1,10 @@
-package conversations;
+package model.conversations;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import users.User;
+import model.users.User;
 
 public class ConversationManager {
 	
