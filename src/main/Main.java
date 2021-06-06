@@ -10,19 +10,17 @@ public class Main {
 	public static void main(String[] args) {
 	
 		
-		User capra = new User("capra");
+		//User banana = new User("banana");
 	
-		//capra.createUser("capraPass");
-		
-		User banana  = new User("banana");
-		
 		//banana.createUser("bananaPass");
 		
+		//banana.modifyPassword("capraPass");
 		
-		String publicKey = UserDAO.getPublicKey("banana");
+		RSA rsa = new RSA(100);
 
-		System.out.println(publicKey);
 		
+		String encr = rsa.encryptText("ciao", rsa.getPublicKey()[0].toString(), rsa.getPublicKey()[1].toString());
+		System.out.println(encr);
 		
 	}
 

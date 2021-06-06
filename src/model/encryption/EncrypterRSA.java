@@ -29,7 +29,6 @@ public class EncrypterRSA implements EncrypterIF {
 
 	@Override
 	public void setEncryptionKey(String[] encryptionKey) {
-		System.out.println(encryptionKey);
 		this.encryptionKey = encryptionKey;
 	}
 

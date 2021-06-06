@@ -95,35 +95,12 @@ public class UserDAO {
 
 	public static boolean authenticate(User user, String passwordAttempt) {
 
-		String userId = user.getId();
+		String password = getPassword(user);
 
-		try {
-
-			connection = ConnectionToDB.startConnection();
-
-			String sql = "select `password` from `Users` where id=?";
-			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			preparedStatement.setString(1, userId);
-
-
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-
-			String password = null;
-			while(resultSet.next()) {
-				password = resultSet.getString(1);
-			}
-
-			if(passwordAttempt.equals(password)) {
-				//registerNewPublicKey(user);
-				return true;
-			}
-
-
-		}catch(SQLException e) {
-			e.printStackTrace();
-			ConnectionToDB.closeConnection();
+		if(passwordAttempt.equals(password)) {
+			return true;
 		}
+
 
 		return false;
 	}
@@ -170,8 +147,54 @@ public class UserDAO {
 	}
 
 
+	public static void modifyPassword(User user, String newPassword) {
 
 
+		//update the password
+		connection = ConnectionToDB.startConnection();
+
+		try {
+			Statement statement  = connection.createStatement();
+
+			statement.executeUpdate(" UPDATE Users\n"
+					+ "SET password = \""+newPassword+"\"\n"
+					+ "WHERE id = \""+user.getId()+"\"");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+
+
+	public static String getPassword(User user) {
+
+		String userId = user.getId();
+
+		try {
+			connection = ConnectionToDB.startConnection();
+
+			String sql = "select `password` from `Users` where id=?";
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, userId);
+
+
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+
+			String password = null;
+			while(resultSet.next()) {
+				password = resultSet.getString(1);
+			}
+
+			return password;
+
+		}catch(SQLException e) {
+
+		}
+
+		return null;
+	}
 
 
 

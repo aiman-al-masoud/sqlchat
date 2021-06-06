@@ -95,14 +95,15 @@ public class User {
 		//build the default encrypter.
 		encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
 
+		//encrypt passwordAttempt, 'cuz the one on the server is encrypted
+		encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
+		String encryptedPasswordAttempt = encrypter.encrypt(passwordAttempt);
+		
 		//authenticate this user, and write their public key to the DB
-		if(UserDAO.authenticate(this, passwordAttempt)) {
+		if(UserDAO.authenticate(this, encryptedPasswordAttempt )) {
 
 			//if login was successful, set the login variable to true.
 			loggedIn = true;
-
-			//if login was successful, register a new public key for this user.
-			//UserDAO.registerNewPublicKey(this);
 
 			//return success
 			return true;
@@ -153,6 +154,9 @@ public class User {
 
 			//send the message to the recipient
 			MessageDAO.messageUser(currentConversation.getId(), this, message);
+			
+			//change the ecnrypter 
+			changeEncrypter();
 
 		}
 	}
@@ -196,7 +200,15 @@ public class User {
 	 * @param password
 	 */
 	public void createUser(String password) {
-		UserDAO.createUser(id, password);
+		
+		encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
+		
+		encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
+		String encryptedPassword = encrypter.encrypt(password);
+		
+		UserDAO.createUser(id, encryptedPassword);
+		
+		UserDAO.registerNewPublicKey(this);
 	}
 
 
@@ -250,7 +262,40 @@ public class User {
 		public void update(ArrayList<Message> messages);
 	}
 
+	/**
+	 * Modify the password stored on the server.
+	 * @param currentPassword
+	 * @param newPassword
+	 */
+	public void modifyPassword(String newPassword) {
+		encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
+		encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
+		String encryptedPassword = encrypter.encrypt(newPassword);
+		UserDAO.modifyPassword(this, encryptedPassword);
+	}
 
+	
+	public void changeEncrypter() {
+		
+		//get the password 
+		String password = UserDAO.getPassword(this);
+		
+		//decipher it
+		String plainPassword = encrypter.decipher(password);
+		
+		//get a new encrypter 
+		encrypter = EncrypterBuilder.getInstance().getNewEncrypter();
+		
+		//encrypt the password with the new public key
+		encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
+		String encryptedPassword = encrypter.encrypt(plainPassword);
+		
+		//re-insert the newly-encrypted password on the DB.
+		UserDAO.modifyPassword(this, encryptedPassword);
+		
+		//change the public key on the DB.
+		UserDAO.registerNewPublicKey(this);
+	}
 
 
 
