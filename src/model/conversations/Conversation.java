@@ -90,6 +90,10 @@ public class Conversation extends File{
 		}
 	}
 
+	
+	public String getId() {
+		return otherUser.getId();
+	}
 
 	
 	

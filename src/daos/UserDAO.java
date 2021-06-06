@@ -133,8 +133,6 @@ public class UserDAO {
 
 		connection = ConnectionToDB.startConnection();
 
-
-
 		try {
 			Statement statement  = connection.createStatement();
 

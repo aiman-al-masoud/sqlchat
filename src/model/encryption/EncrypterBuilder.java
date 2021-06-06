@@ -1,8 +1,14 @@
 package model.encryption;
 
 import java.io.File;
-
 import rsa.RSA;
+
+
+/**
+ * EncrypterBuilder handles the creation and setup
+ * of an encrypter for other parts of the project.
+ *
+ */
 
 public class EncrypterBuilder {
 
@@ -23,6 +29,10 @@ public class EncrypterBuilder {
 	}
 
 
+	/**
+	 * Get the old encypter if there was any.
+	 * @return
+	 */
 	public EncrypterIF getDefaultEncrypter() {
 		
 		//if no encrypter was found on disk, make and save a new one 
@@ -35,7 +45,10 @@ public class EncrypterBuilder {
 	}
 
 
-	
+	/**
+	 * Make a new encrypter and store it.
+	 * @return
+	 */
 	public EncrypterIF getNewEncrypter() {
 		RSA rsa = new RSA(300);
 		rsa.save(defaultEncrypterFile.getPath());
