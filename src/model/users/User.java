@@ -1,6 +1,8 @@
 package model.users;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 import daos.MessageDAO;
@@ -155,8 +157,6 @@ public class User {
 			//send the message to the recipient
 			MessageDAO.messageUser(currentConversation.getId(), this, message);
 			
-			//change the ecnrypter 
-			//changeEncrypter();
 
 		}
 	}
@@ -234,6 +234,15 @@ public class User {
 	}
 
 	/**
+	 * Is the User currently involved in a conversation?
+	 * @return
+	 */
+	public boolean isInConversation() {
+		return currentConversation==null? false : true;
+	}
+	
+	
+	/**
 	 * get this user's public key.
 	 * @return
 	 */
@@ -273,13 +282,18 @@ public class User {
 	 * @param newPassword
 	 */
 	public void modifyPassword(String newPassword) {
-		encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
-		encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
-		String encryptedPassword = encrypter.encrypt(newPassword);
-		UserDAO.modifyPassword(this, encryptedPassword);
+		if(loggedIn) {
+			encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
+			encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
+			String encryptedPassword = encrypter.encrypt(newPassword);
+			UserDAO.modifyPassword(this, encryptedPassword);
+		}	
 	}
 
 	
+	/**
+	 * Change the current encrypter, modifying the relative info stored publicly on the DB.
+	 */
 	public void changeEncrypter() {
 		
 		//get the password 
@@ -302,6 +316,32 @@ public class User {
 		UserDAO.registerNewPublicKey(this);
 	}
 
+	
+	
+	/**
+	 * Start polling the server every x seconds for new messages.
+	 */
+	public void startPullingMessages() {
+		
+		//reference to this User.
+		User myself = this;
+
+		//make a new timertask that pulls messages for this User.
+		TimerTask task = new TimerTask() {
+
+			@Override
+			public void run() {
+				myself.pullMessages();
+			}
+			
+		};
+		
+		//start the timer, poll the server every 1 second for new messages.
+		Timer timer = new Timer();
+		timer.schedule(task, 0, 1000);
+		
+	}
+	
 
 
 

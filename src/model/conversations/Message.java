@@ -2,6 +2,8 @@ package model.conversations;
 
 import java.util.Date;
 
+import model.users.UserManager;
+
 public class Message {
 
 	long timeSent; //in unix time
@@ -48,7 +50,19 @@ public class Message {
 	}
 
 	public String prettyToString() {
-		return getTimeSent()+", from: "+senderId+", message: "+message;
+		
+		String prettyMessage = getTimeSent()+" ";
+		
+		
+		if(senderId.equals(UserManager.getInstance().getLocalUser().getId())) {
+			prettyMessage+="[you]: ";
+		}else {
+			prettyMessage+="["+senderId+"]: ";
+		}
+		
+		
+		
+		return prettyMessage+message;
 	}
 
 

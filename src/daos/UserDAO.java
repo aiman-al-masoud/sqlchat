@@ -20,9 +20,13 @@ public class UserDAO {
 	}
 
 
+	/**
+	 * Get all of the usernames on the server.
+	 * @return
+	 */
 	public static ArrayList<User> selectAll() {
 
-		String query = "select * from Users";
+		String query = "select `id` from Users";
 
 		ArrayList<User> result = new ArrayList<User>();
 
@@ -31,8 +35,7 @@ public class UserDAO {
 			Statement statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(query); //execute only works for read-only queries
 			while(resultSet.next()) {
-				//one record for each iteration of the loop
-				//starts counting from 1 onwards!!
+				//one record for each iteration of the loop. getString(n) starts counting from n = 1 onwards!!
 				result.add(new User(resultSet.getString(1)));
 			}
 
@@ -46,6 +49,10 @@ public class UserDAO {
 		return result;
 
 	}
+	
+	
+	
+	
 
 
 	/**
@@ -90,32 +97,45 @@ public class UserDAO {
 	}
 
 
-
-
-
+	/**
+	 * Check if a password entered by the user is the same as the one stored on the server.
+	 * @param user
+	 * @param passwordAttempt
+	 * @return
+	 */
 	public static boolean authenticate(User user, String passwordAttempt) {
 
+		//get the encrypted password from the server
 		String password = getPassword(user);
 
+		//if the password attempt is successful, return true
 		if(passwordAttempt.equals(password)) {
 			return true;
 		}
-
 
 		return false;
 	}
 
 
+	/**
+	 * Register a User's new public key on the server.
+	 * @param user
+	 */
 	public static void registerNewPublicKey(User user) {
 
 		connection = ConnectionToDB.startConnection();
 
 		try {
-			Statement statement  = connection.createStatement();
-
-			statement.executeUpdate(" UPDATE Users\n"
-					+ "SET publicKey = \""+user.getPublicKey()+"\"\n"
-					+ "WHERE id = \""+user.getId()+"\"");
+			
+			String sql = " UPDATE Users\n"
+					+ "SET publicKey = ?\n"
+					+ "WHERE id = ?";
+			
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, user.getPublicKey());
+			preparedStatement.setString(2, user.getId());
+			preparedStatement.executeUpdate();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -124,13 +144,23 @@ public class UserDAO {
 
 
 
+	/**
+	 * Get a User's public key from the server.
+	 * @param userId
+	 * @return
+	 */
 	public static String getPublicKey(String userId) {
 		connection = ConnectionToDB.startConnection();
 
 		try {
-			Statement statement  = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery("select publicKey from Users where id = \""+userId+"\"");
-
+			
+			String sql = "select publicKey from Users where id = ?";
+			
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, userId);		
+			ResultSet resultSet = preparedStatement.executeQuery();
+			
+			
 			String publicKey;
 			while(resultSet.next()) {
 				publicKey = resultSet.getString(1);
@@ -147,18 +177,30 @@ public class UserDAO {
 	}
 
 
+	/**
+	 * Modify a user's password on the server.
+	 * @param user
+	 * @param newPassword
+	 */
 	public static void modifyPassword(User user, String newPassword) {
 
-
-		//update the password
+		//get the connection
 		connection = ConnectionToDB.startConnection();
 
 		try {
-			Statement statement  = connection.createStatement();
-
-			statement.executeUpdate(" UPDATE Users\n"
-					+ "SET password = \""+newPassword+"\"\n"
-					+ "WHERE id = \""+user.getId()+"\"");
+			
+			//standardized update-query
+			String sql = " UPDATE `Users`\n"
+					+ "SET `password` = ?\n"
+					+ "WHERE `id` = ?";
+			
+			//make a prepared statement
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, newPassword.trim());
+			preparedStatement.setString(2, user.getId());			
+			preparedStatement.executeUpdate();
+		
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -166,21 +208,21 @@ public class UserDAO {
 	}
 
 
+	/**
+	 * Get a User's (ecnrypted) password from the server.
+	 * @param user
+	 * @return
+	 */
 
 	public static String getPassword(User user) {
-
-		String userId = user.getId();
 
 		try {
 			connection = ConnectionToDB.startConnection();
 
 			String sql = "select `password` from `Users` where id=?";
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			preparedStatement.setString(1, userId);
-
-
+			preparedStatement.setString(1, user.getId());
 			ResultSet resultSet = preparedStatement.executeQuery();
-
 
 			String password = null;
 			while(resultSet.next()) {
@@ -198,6 +240,27 @@ public class UserDAO {
 
 
 
+	/**
+	 * Create the Users table. To be called in case it doesn't exist on the server yet.
+	 */
+	public static void createUsersTable() {
+		
+		Connection connection = ConnectionToDB.startConnection();
+		String sql = "CREATE TABLE `Users` (\n" + 
+				"  `id` varchar(30) NOT NULL,\n" + 
+				"  `password` varchar(1200) DEFAULT NULL,\n" + 
+				"  `publicKey` varchar(1200) DEFAULT NULL,\n" + 
+				"   PRIMARY KEY (`id`))\n";
+		
+		try {
+			Statement statement  = connection.createStatement();
+			statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 
 
 
