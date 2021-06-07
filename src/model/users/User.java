@@ -156,7 +156,7 @@ public class User {
 			MessageDAO.messageUser(currentConversation.getId(), this, message);
 			
 			//change the ecnrypter 
-			changeEncrypter();
+			//changeEncrypter();
 
 		}
 	}
@@ -189,6 +189,11 @@ public class User {
 				listener.update(incomingMessages);
 			}
 
+			//change my public key, so that the next time I get sent messages, those new messages are ecnrypted with a different key.
+			if(incomingMessages.size()!=0) {
+				changeEncrypter();
+			}
+			
 		}
 
 	}
