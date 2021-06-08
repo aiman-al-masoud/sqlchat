@@ -1,6 +1,10 @@
 package model.encryption;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import rsa.RSA;
 
 
@@ -40,8 +44,9 @@ public class EncrypterBuilder {
 			return getNewEncrypter();
 
 		//else load the old encrypter
-		RSA rsa = RSA.load(defaultEncrypterFile.getPath());
-		return new EncrypterRSA(rsa);
+		return load(defaultEncrypterFile.getPath());
+		//RSA rsa = RSA.load(defaultEncrypterFile.getPath());
+		//return new EncrypterRSA(rsa);
 	}
 
 
@@ -50,11 +55,29 @@ public class EncrypterBuilder {
 	 * @return
 	 */
 	public EncrypterIF getNewEncrypter() {
-		RSA rsa = new RSA(300);
-		rsa.save(defaultEncrypterFile.getPath());
-		return new EncrypterRSA(rsa);
+		
+		EncrypterRSA rsaEncr =  new EncrypterRSA(new RSA(300));
+		
+		//RSA rsa = new RSA(300);
+		rsaEncr.save(defaultEncrypterFile.getPath());
+		
+		//rsa.save();
+		//return new EncrypterRSA(rsa);
+		return rsaEncr;
 	}
 
+	
+	public static EncrypterIF load(String pathname) {
+		try {
+			ObjectInputStream objInputStream = new ObjectInputStream(new FileInputStream(new File(pathname)));
+			return (EncrypterIF)objInputStream.readObject();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 
 

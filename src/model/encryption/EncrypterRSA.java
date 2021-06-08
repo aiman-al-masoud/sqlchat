@@ -1,21 +1,23 @@
 package model.encryption;
 
 
+
+
 import rsa.RSA;
 
-public class EncrypterRSA implements EncrypterIF {
+public class EncrypterRSA  extends AbstractEncrypter{
 
 	public RSA rsa;
 	int numberOfBaseTenDigits = 300;
-	
+
 	//e, n
 	String[] encryptionKey;
-	
+
 	public EncrypterRSA(RSA rsa) {
 		this.rsa = rsa;
 	}
-	
-	
+
+
 	@Override
 	public String encrypt(String plaintext) {
 		//plaintext, public exponent, product of two primes
@@ -45,8 +47,15 @@ public class EncrypterRSA implements EncrypterIF {
 		publicKey[1] = rsa.getPublicKey()[1].toString();
 		return publicKey;
 	}
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
 
 }
