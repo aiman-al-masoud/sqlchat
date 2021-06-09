@@ -12,6 +12,7 @@ import model.conversations.ConversationManager;
 import model.conversations.Message;
 import model.encryption.EncrypterBuilder;
 import model.encryption.EncrypterIF;
+import sha256.SHA256;
 
 /**
  * The User accesses his/her conversations, sending or receiving 
@@ -59,6 +60,10 @@ public class User {
 
 
 
+	/**
+	 * the hasher is used to safely store passwords on the server. 
+	 */
+	SHA256 hasher;
 
 
 
@@ -69,6 +74,8 @@ public class User {
 		listeners = new ArrayList<UserListener>();
 		//create a logger
 		logger = Logger.getLogger("UserLogger");
+		//create a SHA256 object to encrypt passwords
+		hasher = new SHA256();
 	}
 
 
@@ -97,10 +104,9 @@ public class User {
 		//build the default encrypter.
 		encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
 
-		//encrypt passwordAttempt, 'cuz the one on the server is encrypted
-		encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
-		String encryptedPasswordAttempt = encrypter.encrypt(passwordAttempt);
-		
+		//hash the password attempt to comapre it to the hashed, stored password on the server
+		String encryptedPasswordAttempt = hasher.encrypt(passwordAttempt);
+
 		//authenticate this user, and write their public key to the DB
 		if(UserDAO.authenticate(this, encryptedPasswordAttempt )) {
 
@@ -156,7 +162,7 @@ public class User {
 
 			//send the message to the recipient
 			MessageDAO.messageUser(currentConversation.getId(), this, message);
-			
+
 
 		}
 	}
@@ -189,11 +195,11 @@ public class User {
 				listener.update(incomingMessages);
 			}
 
-			//change my public key, so that the next time I get sent messages, those new messages are ecnrypted with a different key.
+			//change my public key, so that the next time I get sent messages, those new messages are encrypted with a different key.
 			if(incomingMessages.size()!=0) {
 				changeEncrypter();
 			}
-			
+
 		}
 
 	}
@@ -205,14 +211,9 @@ public class User {
 	 * @param password
 	 */
 	public void createUser(String password) {
-		
 		encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
-		
-		encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
-		String encryptedPassword = encrypter.encrypt(password);
-		
+		String encryptedPassword = hasher.encrypt(password);
 		UserDAO.createUser(id, encryptedPassword);
-		
 		UserDAO.registerNewPublicKey(this);
 	}
 
@@ -240,8 +241,8 @@ public class User {
 	public boolean isInConversation() {
 		return currentConversation==null? false : true;
 	}
-	
-	
+
+
 	/**
 	 * get this user's public key.
 	 * @return
@@ -283,46 +284,30 @@ public class User {
 	 */
 	public void modifyPassword(String newPassword) {
 		if(loggedIn) {
-			encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
-			encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
-			String encryptedPassword = encrypter.encrypt(newPassword);
+			String encryptedPassword = hasher.encrypt(newPassword);
 			UserDAO.modifyPassword(this, encryptedPassword);
 		}	
 	}
 
-	
+
 	/**
 	 * Change the current encrypter, modifying the relative info stored publicly on the DB.
 	 */
 	public void changeEncrypter() {
 		
-		//get the password 
-		String password = UserDAO.getPassword(this);
-		
-		//decipher it
-		String plainPassword = encrypter.decipher(password);
-		
 		//get a new encrypter 
 		encrypter = EncrypterBuilder.getInstance().getNewEncrypter();
-		
-		//encrypt the password with the new public key
-		encrypter.setEncryptionKey(new String[]{encrypter.getPublicKey()[0], encrypter.getPublicKey()[1]});
-		String encryptedPassword = encrypter.encrypt(plainPassword);
-		
-		//re-insert the newly-encrypted password on the DB.
-		UserDAO.modifyPassword(this, encryptedPassword);
-		
 		//change the public key on the DB.
 		UserDAO.registerNewPublicKey(this);
 	}
 
-	
-	
+
+
 	/**
 	 * Start polling the server every x seconds for new messages.
 	 */
 	public void startPullingMessages() {
-		
+
 		//reference to this User.
 		User myself = this;
 
@@ -333,15 +318,15 @@ public class User {
 			public void run() {
 				myself.pullMessages();
 			}
-			
+
 		};
-		
+
 		//start the timer, poll the server every 1 second for new messages.
 		Timer timer = new Timer();
 		timer.schedule(task, 0, 1000);
-		
+
 	}
-	
+
 
 
 

@@ -83,7 +83,7 @@ public class MessageDAO {
 			while(resultSet.next()) {
 				//one record for each iteration of the loop
 				//starts counting from 1 onwards!!
-				result.add(new Message(Long.parseLong(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(3)));
+				result.add(new Message(Long.parseLong(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(3) ));
 			}
 
 			//delete all messages from the mail-box table

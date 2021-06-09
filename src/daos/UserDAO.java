@@ -83,6 +83,7 @@ public class UserDAO {
 					+ "`timestamp` BIGINT,\n"
 					+ "`senderId` VARCHAR(30),\n"
 					+ "`message` VARCHAR(5000),\n"
+					+ "`messageHash` VARCHAR(1000),\n"
 					+ "CONSTRAINT primaryKey PRIMARY KEY (`timestamp`, `senderId`)\n"
 					+ ")";
 			Statement statement = connection.createStatement();
