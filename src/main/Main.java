@@ -1,7 +1,6 @@
 package main;
 
 
-import model.users.User;
 import view.Shell;
 
 public class Main {

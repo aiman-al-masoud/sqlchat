@@ -45,8 +45,6 @@ public class EncrypterBuilder {
 
 		//else load the old encrypter
 		return load(defaultEncrypterFile.getPath());
-		//RSA rsa = RSA.load(defaultEncrypterFile.getPath());
-		//return new EncrypterRSA(rsa);
 	}
 
 
@@ -58,11 +56,8 @@ public class EncrypterBuilder {
 		
 		EncrypterRSA rsaEncr =  new EncrypterRSA(new RSA(300));
 		
-		//RSA rsa = new RSA(300);
 		rsaEncr.save(defaultEncrypterFile.getPath());
 		
-		//rsa.save();
-		//return new EncrypterRSA(rsa);
 		return rsaEncr;
 	}
 
