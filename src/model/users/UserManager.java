@@ -9,7 +9,7 @@ public class UserManager {
 
 	private User localUser;
 	private static UserManager instance;
-	private static File localUserFile = new File("res/settings/localUser");
+	private static File localUserFile = new File("res"+File.separator+"settings"+File.separator+"localUser");
 
 	public static UserManager getInstance() {
 
@@ -67,6 +67,7 @@ public class UserManager {
 	 */
 	public void saveLocalUser(User user){
 		localUser = user;
+		
 		try {
 			FileIO.write(localUserFile.getPath(), localUser.getId());
 		}catch(NullPointerException e) {
@@ -75,20 +76,10 @@ public class UserManager {
 	}
 
 	
-	
-	public static void main(String[] args) {
-		User capra = new User("capra");
-		
-		UserManager.getInstance().saveLocalUser(capra);
-		
-		User localUser = UserManager.getInstance().getLocalUser();
-		
-		
-		System.out.println(localUser);
+	public void deleteLocalUser() {
+		saveLocalUser(null);
 	}
 	
-
-
 	
 
 

@@ -125,6 +125,23 @@ public class User {
 
 
 	/**
+	 * logout disables all of the connectivity-related features of this object
+	 */
+	public void logout() {
+		loggedIn = false;
+		
+		//notify listeners
+		for(UserListener listener : listeners) {
+			listener.updateStatus(UserStatus.LOGGING_OUT, null);
+			UserManager.getInstance().deleteLocalUser();
+		}
+	}
+	
+	
+	
+	
+	
+	/**
 	 * Sends a message to the current conversation.
 	 * Only works if this user is logged in.
 	 * @param recipientId
@@ -151,7 +168,7 @@ public class User {
 
 			//get the recipient's public key
 			String encryptionKey = UserDAO.getPublicKey(currentConversation.getId());
-			//if the recipient does have an encryption key:
+			//if the recipient DOES have an encryption key:
 			if(encryptionKey!=null) {
 				//set it as the encryption key
 				encrypter.setEncryptionKey(encryptionKey.split("\\s+"));
@@ -225,6 +242,12 @@ public class User {
 	 */
 	public void enterConversation(Conversation conversation) {
 		this.currentConversation = conversation;
+
+		//notify listeners!
+		for(UserListener listener : listeners) {
+			listener.updateStatus(UserStatus.ENTERING_CONVERSATION,  new Object[] {currentConversation});
+		}
+
 	}
 
 	/**
@@ -232,6 +255,11 @@ public class User {
 	 */
 	public void exitConversation() {
 		this.currentConversation  =null;
+
+		//notify listeners!
+		for(UserListener listener : listeners) {
+			listener.updateStatus(UserStatus.EXITING_CONVERSATION,  null);
+		}
 	}
 
 	/**
@@ -271,10 +299,11 @@ public class User {
 
 	/**
 	 * This interface is meant to be implemented by UI
-	 * classes that have to display updated info about the User.
+	 * classes that have to display up-to-date info about the User.
 	 */
 	public interface UserListener{
 		public void update(ArrayList<Message> messages);
+		public void updateStatus(UserStatus status, Object[] objects);
 	}
 
 	/**
@@ -294,7 +323,7 @@ public class User {
 	 * Change the current encrypter, modifying the relative info stored publicly on the DB.
 	 */
 	public void changeEncrypter() {
-		
+
 		//get a new encrypter 
 		encrypter = EncrypterBuilder.getInstance().getNewEncrypter();
 		//change the public key on the DB.
