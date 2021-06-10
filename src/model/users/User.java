@@ -21,8 +21,6 @@ import sha256.SHA256;
 
 public class User {
 
-
-
 	/**
 	 * This user's id
 	 */
@@ -33,32 +31,25 @@ public class User {
 	 */
 	private boolean loggedIn = false;
 
-
 	/**
 	 * This user's listers
 	 */
 	private ArrayList<UserListener> listeners;
 
-
 	/**
 	 * The current conversation that the user is in
 	 */
 	Conversation currentConversation;
-
-
+	
 	/**
 	 * This User's current encrypter
 	 */
 	EncrypterIF encrypter;
 
-
-
 	/**
 	 * A logger for any logs produced by this user.
 	 */
 	Logger logger;
-
-
 
 	/**
 	 * the hasher is used to safely store passwords on the server. 
@@ -122,8 +113,6 @@ public class User {
 	}
 
 
-
-
 	/**
 	 * logout disables all of the connectivity-related features of this object
 	 */
@@ -136,9 +125,6 @@ public class User {
 			UserManager.getInstance().deleteLocalUser();
 		}
 	}
-	
-	
-	
 	
 	
 	/**
@@ -176,11 +162,8 @@ public class User {
 				message = encrypter.encrypt(message);
 			}
 
-
 			//send the message to the recipient
 			MessageDAO.messageUser(currentConversation.getId(), this, message);
-
-
 		}
 	}
 
@@ -221,8 +204,6 @@ public class User {
 
 	}
 
-
-
 	/**
 	 * Tell the server to store a new user.
 	 * @param password
@@ -233,8 +214,6 @@ public class User {
 		UserDAO.createUser(id, encryptedPassword);
 		UserDAO.registerNewPublicKey(this);
 	}
-
-
 
 	/**
 	 * Set a new conversation as the current conversation.
