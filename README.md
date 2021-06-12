@@ -6,7 +6,7 @@ A simple db-based instant messaging service.
 You need to have a mysql server up and running for this app to work. 
 
 You can create an account online for a remote server (sometimes even for free),
-or set your own mysql server on your personal computer*.
+or set your own mysql server on your personal computer (*1)
 
 After you create the database, however you decide to do that, you will need to make sure that you have these
 4 pieces of information readily at your disposal:
@@ -49,7 +49,7 @@ password : example_password
 schema : example_schema
 
 
-## When you're done setting your connection up, you can create an account on the server you just configured:
+## When you're done setting up your connection, you can create an account on the server you just configured:
 
 java -jar sqlchat.jar signup
 
@@ -67,14 +67,15 @@ on a piece of paper), and after they're done setting up the app and creating a n
 can start chatting! Your conversations are NOT kept on the server once you download them, and, in the 
 meanwhile, they're encrypted with 300-digit (decimal) RSA.
 
+## Help
+You can run the app with the following argument to get a list of the available commands:
+
+java -jar sqlchat.jar help
 
 
+## Sidenotes
 
-
-
-
-
-*In this second case, to use the app with people that aren't connected to your
+(*1) In this second case, to use the app with people that aren't connected to your
 local network, you need to make sure that your router supports port-forwarding 
 (or something similar) if you have NAT. Also, it would'nt be wise to 
 distribute your IP address to others, so maybe getting a DNS domain
