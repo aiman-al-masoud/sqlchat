@@ -77,6 +77,6 @@ java -jar sqlchat.jar help
 
 (*1) In this second case, to use the app with people that aren't connected to your
 local network, you need to make sure that your router supports port-forwarding 
-(or something similar) if you have NAT. Also, it would'nt be wise to 
+(or something similar) if you have NAT. Also, it wouldn't be wise to 
 distribute your IP address to others, so maybe getting a DNS domain
 would be a good idea.
