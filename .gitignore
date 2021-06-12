@@ -2,7 +2,7 @@
 
 
 #local parameters and settings
-settings/netConfig
-settings/localUser
-conversations/
-encrypters/
+res/settings/netConfig
+res/settings/localUser
+res/conversations/
+res/encrypters/
