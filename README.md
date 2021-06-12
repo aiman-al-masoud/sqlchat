@@ -27,8 +27,9 @@ the aforementioned user's password.
 the schema all of the tables are gonna spawn in. 
 (Note that: in this simple project all of the tables go in one schema).
 
+## configuring the connection
 
-When you do have these information, you can run the jar with the following argument:
+When you do have these four pieces of information, you can run the jar with the following argument:
 
 java -jar sqlchat.jar config
 
