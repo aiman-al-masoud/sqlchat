@@ -54,6 +54,12 @@ public class EncrypterBuilder {
 	 */
 	public EncrypterIF getNewEncrypter() {
 		
+		//create the dir if it doesn't exist
+		if(!new File("res/encrypters").exists()) {
+			new File("res/encrypters").mkdir();
+		}
+		
+		
 		EncrypterRSA rsaEncr =  new EncrypterRSA(new RSA(300));
 		
 		rsaEncr.save(defaultEncrypterFile.getPath());
