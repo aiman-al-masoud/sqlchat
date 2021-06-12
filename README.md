@@ -11,11 +11,20 @@ or set your own mysql server on your personal computer*.
 After you create the database, however you decide to do that, you will need to make sure that you have these
 4 pieces of information at your disposal:
 
-domain : this could be your IP, or a domain name for an online mysql hosting service. 
-port : (By default) 3306.
-username : the username you created (eg: root), or which was provided by the online service. 
-password : the aforementioned user's password.
-schema : the schema all of the tables are gonna spawn in. 
+### domain : 
+this could be your IP, or a domain name for an online mysql hosting service. 
+
+### port : 
+(By default) 3306.
+
+### username : 
+the username you created (eg: root), or which was provided by the online service. 
+
+### password : 
+the aforementioned user's password.
+
+### schema : 
+the schema all of the tables are gonna spawn in. 
 (Note that: in this simple project all of the tables go in one schema).
 
 
@@ -29,23 +38,29 @@ Alternatively, you can manually create and fill the res/settings/netConfig file,
 it up with the information in this format:
 
 domain : example.example.net
-port : 3306
+
+port : 3306 
+
 username : example_user
+
 password : example_password
+
 schema : example_schema
 
-When you're done setting your connection up, you can create an account on the server you just configured:
+
+## When you're done setting your connection up, you can create an account on the server you just configured:
 
 java -jar sqlchat.jar signup
 
 This will prompt you to choose a new username and a new password.
 
-Now you can launch the app:
+## Now you can launch the app:
 
 java -jar sqlchat.jar
 
 It will prompt you to enter your password.
 
+## Connecting to others:
 You're done! Now you can send the 4 configuration parameters to a friend (through some safe means, possibly 
 on a piece of paper), and after they're done setting up the app and creating a new account, you two
 can start chatting! Your conversations are NOT kept on the server once you download them, and, in the 
