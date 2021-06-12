@@ -20,14 +20,18 @@ public class ConnectionToDB {
 	
 	//connection, and connection-related parameters
 	static private Connection connection;
-	static private String domain = "sql11.freemysqlhosting.net";
-	static private int port = 3306;
-	static private String username = "sql11415583";
-	static private String password = "xlswAUuwlk";
-	static private String schema = "sql11415583";
-	static private String DBURL = "jdbc:mysql://"+domain+":"+port+"/"+schema;
+	static private String domain;
+	static private int port;
+	static private String username;
+	static private String password;
+	static private String schema;
+	static private String DBURL;
 
 
+	static private ConfigFile connConfig;
+	static private String CONFIGFILE_PATH = "res/settings/netConfig";
+	
+	
 	//checks if a connection is already open
 	private  static boolean isOpen() {
 		if(connection == null) {
@@ -63,7 +67,17 @@ public class ConnectionToDB {
 			return connection;
 		}
 		
-		//else, if connection still has to be opened, do it
+		//else, retreive config settings from config file
+		connConfig = new ConfigFile(CONFIGFILE_PATH);
+		domain = connConfig.get("domain");
+		port = Integer.parseInt(connConfig.get("port"));
+		username = connConfig.get("username");
+		password = connConfig.get("password");
+		schema = connConfig.get("schema");
+		DBURL = "jdbc:mysql://"+domain+":"+port+"/"+schema;
+
+		
+		//connection still has to be opened, do it
 		try {
 			connection = DriverManager.getConnection(DBURL, username, password);
 		}catch(Exception e ) {
