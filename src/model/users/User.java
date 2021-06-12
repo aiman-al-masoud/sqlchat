@@ -78,13 +78,18 @@ public class User {
 		return id;
 	}
 
-	@Override
-	public String toString() {
-		return getId();
+	
+	/**
+	 * Is the user currently logged in?
+	 * @return
+	 */
+	public boolean isLoggedIn() {
+		return loggedIn;
 	}
-
-
-
+	
+	
+	
+	
 	/**
 	 * Log the user in after they input the right password.
 	 * @param passwordAttempt
@@ -95,11 +100,11 @@ public class User {
 		//build the default encrypter.
 		encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
 
-		//hash the password attempt to comapre it to the hashed, stored password on the server
+		//hash the password attempt, to comapre it to the hashed password on the server
 		String encryptedPasswordAttempt = hasher.encrypt(passwordAttempt);
 
-		//authenticate this user, and write their public key to the DB
-		if(UserDAO.authenticate(this, encryptedPasswordAttempt )) {
+		//authenticate this user
+		if(UserDAO.authenticate(this, encryptedPasswordAttempt)) {
 
 			//if login was successful, set the login variable to true.
 			loggedIn = true;
@@ -249,7 +254,6 @@ public class User {
 		return currentConversation==null? false : true;
 	}
 
-
 	/**
 	 * get this user's public key.
 	 * @return
@@ -257,8 +261,6 @@ public class User {
 	public String getPublicKey() {
 		return encrypter.getPublicKey()[0]+" "+encrypter.getPublicKey()[1];
 	}
-
-
 
 	/**
 	 * Add a user-listener to this User.
@@ -331,7 +333,8 @@ public class User {
 
 		//start the timer, poll the server every 1 second for new messages.
 		Timer timer = new Timer();
-		timer.schedule(task, 0, 1000);
+		long millisecs = 1000;
+		timer.schedule(task, 0, millisecs);
 
 	}
 

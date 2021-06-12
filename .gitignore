@@ -1,0 +1,8 @@
+/bin/
+
+
+#local parameters and settings
+settings/netConfig
+settings/localUser
+conversations/
+encrypters/

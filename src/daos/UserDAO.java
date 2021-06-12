@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
+
 import io.ConnectionToDB;
 import model.users.User;
 
@@ -247,7 +248,7 @@ public class UserDAO {
 	public static void createUsersTable() {
 		
 		Connection connection = ConnectionToDB.startConnection();
-		String sql = "CREATE TABLE `Users` (\n" + 
+		String sql = "CREATE TABLE IF NOT EXISTS `Users` (\n" + 
 				"  `id` varchar(30) NOT NULL,\n" + 
 				"  `password` varchar(1200) DEFAULT NULL,\n" + 
 				"  `publicKey` varchar(1200) DEFAULT NULL,\n" + 

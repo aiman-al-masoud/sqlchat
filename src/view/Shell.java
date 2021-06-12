@@ -3,18 +3,18 @@ package view;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import io.FileIO;
 import model.controller.Session;
 import model.controller.Session.SessionListener;
 import model.conversations.Conversation;
-import model.conversations.ConversationManager;
 import model.conversations.Message;
-import model.users.User;
-import model.users.UserManager;
-import model.users.UserStatus;
-import model.users.User.UserListener;
 
 /**
+ * Shell is a user-interface class that makes a set of 
+ * i/o methods available to a "Session" controller.
  * 
+ * The Session controller calls Shell's methods, 
+ * and sometimes gets called/or called-back too.
  * 
  *
  */
@@ -22,8 +22,14 @@ import model.users.User.UserListener;
 public class Shell implements SessionListener{
 
 
+	/**
+	 * To get user input.
+	 */
 	Scanner scanner;
 
+	/**
+	 * The controller calls the methods of Shell, and/or gets called back by Shell. 
+	 */
 	Session controller;
 
 	public Shell(Session controller) {
@@ -55,6 +61,7 @@ public class Shell implements SessionListener{
 	 */
 	@Override
 	public void listConversations(ArrayList<Conversation> conversations) {
+		System.out.println("saved conversations:");
 		for(Conversation conv : conversations) {
 			System.out.println(conv);
 		}
@@ -85,33 +92,13 @@ public class Shell implements SessionListener{
 	 */
 	@Override
 	public void exitConversation(ArrayList<Conversation> conversations) {
-		System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");  
+		for(int i=0; i<100;i++) {
+			System.out.println("");
+		}
 		listConversations(conversations);
+		System.out.println();
 	}
 
-	/**
-	 * Prompts the user to input their username.
-	 */
-	@Override
-	public String getUsernameProcedure() {
-		System.out.println("Please enter your username:");
-		String userId =  scanner.nextLine(); 
-		return userId;
-	}
-
-
-	
-	/**
-	 * Prompts the user to authenticate themselves (entering their password).
-	 */
-	@Override
-	public String getPasswordAttempt() {
-		//prompt user to enter their password
-		System.out.println("Please enter your password to log in:");
-		String passwordAttempt = scanner.nextLine();
-		return passwordAttempt;
-	}
-	
 
 	/**
 	 * if they got it right...
@@ -126,8 +113,7 @@ public class Shell implements SessionListener{
 	 */
 	@Override
 	public void displayHelp() {
-		System.out.println("COMMANDS:");
-		System.out.println("ls: list conversations. open [conversationName]. end: end conversation. ");
+		System.out.println(FileIO.read("res/settings/shellHelp"));
 	}
 
 
@@ -139,6 +125,23 @@ public class Shell implements SessionListener{
 		for(Message message : messages) {
 			System.out.println(message.prettyToString());
 		}
+	}
+
+
+	/**
+	 * Prompts the user to enter some text and returns it to the controller.
+	 */
+	@Override
+	public String userPrompt(String message) {
+		System.out.println(message);
+		String response  = scanner.nextLine();
+		return response ;
+	}
+
+
+	@Override
+	public void userMessage(String message) {
+		System.out.println(message);
 	}
 
 

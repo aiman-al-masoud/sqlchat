@@ -1,6 +1,9 @@
 package model.controller;
 
 import java.util.ArrayList;
+
+import daos.UserDAO;
+import io.ConnectionToDB;
 import model.conversations.Conversation;
 import model.conversations.ConversationManager;
 import model.conversations.Message;
@@ -40,7 +43,6 @@ public class Session implements UserListener{
 	 */
 	public interface SessionListener{
 
-		public String getUsernameProcedure();
 		public void displayHelp();
 		public void listConversations(ArrayList<Conversation> conversations);
 		public void exitConversation(ArrayList<Conversation> conversations);
@@ -48,7 +50,9 @@ public class Session implements UserListener{
 		public void mainLoop();
 		public void conversationLoop(Conversation conversation);
 		public void welcomeUser(String userId);
-		public String getPasswordAttempt();
+		public String userPrompt(String message);
+		public void userMessage(String message);
+
 
 	}
 
@@ -71,38 +75,28 @@ public class Session implements UserListener{
 
 
 	public Session() {
+		//get the current user 
+		localUser = UserManager.getInstance().getLocalUser();
 
+		//add this Session to the User's listeners 
+		if(localUser!=null) {
+			localUser.addListener(this);
+		}
 	}
 
 
-
-
-
-
 	public void startSession(){
-		
-		//get the current user 
-		localUser = UserManager.getInstance().getLocalUser();
 
 		//if no user is currently saved, ask for a userId		
 		if(localUser==null) {
 			setLocalUser();
 		}
-		
-		//add this Session to the User's listeners 
-		localUser.addListener(this);
 
 		//ask the user for their password 
 		passwordLoop();
 
-		//welcome the user if login was successful
-		userInterface.welcomeUser(localUser.getId());
-
 		//start the thread that polls the remote server for incoming messages
 		localUser.startPullingMessages();
-
-		//give user some guidance
-		userInterface.displayHelp();
 
 		//start the main program loop
 		userInterface.mainLoop();
@@ -116,34 +110,60 @@ public class Session implements UserListener{
 
 	public void runCommand(String command) {
 
-		//if command is to exit, then terminate the program
-		if(command.toUpperCase().trim().equals("EXIT")) {
-			//exit the program with no error code.
+		//switch on the first argument of the command
+		String firstArgument = command.split("\\s+")[0].toUpperCase().trim();
+		switch(firstArgument) {
+
+		case "EXIT":
+			//terminate the program with no error code.
 			System.exit(0);
-		}
-
-		//if the command is to logout...
-		if(command.toUpperCase().trim().equals("LOGOUT")) {
+		case "LOGOUT":
+			//log the current user out
 			localUser.logout();
-		}
-
-		//if the command is an "ls", then list the available conversations
-		if(command.toUpperCase().trim().equals("LS")) {
-			userInterface.listConversations(ConversationManager.getInstance().getConversations());
-		}
-
-		//if the command is "help", display help
-		if(command.toUpperCase().trim().equals("HELP")) {
+			break;
+		case "LOGIN":
+			//prompt the user to log in
+			if(!localUser.isLoggedIn()) {
+				setLocalUser();
+				passwordLoop();
+			}
+			break;
+		case "LS":
+			//list the conversations
+			if(localUser.isLoggedIn()) {
+				userInterface.listConversations(ConversationManager.getInstance().getConversations());
+			}
+			break;
+		case "HELP":
+			//display some help
 			userInterface.displayHelp();
+			break;
+		case "OPEN":
+			//open a conversation
+			if(localUser.isLoggedIn()) {
+				Conversation conversation = ConversationManager.getInstance().getConversation(command.split("\\s+")[1].trim());
+				localUser.enterConversation(conversation);	
+			}
+			break;
+		case "CONFIG":
+			//logout, and prompt the user to enter the new connection-settings
+			if(localUser!=null) {
+				localUser.logout();
+			}
+			setConnectionParametersProcedure();
+			break;
+		case "SIGNUP":
+			//lets you pick a new user id and password. 
+			createNewUserProcedure();
+			break;
+		default:
+			//displays default message.
+			userInterface.userMessage("'"+firstArgument+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");
+			break;
+
 		}
 
-		//if the command is to open a conversation...
-		if(command.split("\\s+")[0].toUpperCase().trim().equals("OPEN")) {
-			Conversation conversation = ConversationManager.getInstance().getConversation(command.split("\\s+")[1].trim());
-			localUser.enterConversation(conversation);			
-		}
 	}
-
 
 
 	public void conversationCommand(String command) {
@@ -157,7 +177,7 @@ public class Session implements UserListener{
 		//else, send a message
 		localUser.sendMessage(command);
 	}
-	
+
 
 	public boolean isInConversation() {
 		return localUser.isInConversation();
@@ -165,17 +185,19 @@ public class Session implements UserListener{
 
 
 	public void setLocalUser() {
-		String userId = userInterface.getUsernameProcedure();
+		String userId = userInterface.userPrompt("Enter your user id:");
 		localUser = new User(userId);
 		UserManager.getInstance().saveLocalUser(localUser);
+		//add this Session to the User's listeners 
+		localUser.addListener(this);
 	}
-	
-	
+
+
 	public void passwordLoop() {
 		String passwordAttempt;
 		do {
-			
-			passwordAttempt = userInterface.getPasswordAttempt();	
+
+			passwordAttempt = userInterface.userPrompt("Enter your password:");	
 
 			//////extremely ugly part/////
 			if(passwordAttempt.toUpperCase().equals("LOGOUT")) {
@@ -183,10 +205,42 @@ public class Session implements UserListener{
 				System.exit(0);
 			}
 			////////////////////
-			
+
 		}while(!localUser.logIn(passwordAttempt));
+
+		userInterface.welcomeUser(localUser.getId());
 	}
-	
+
+	public void setConnectionParametersProcedure() {
+		String domain = userInterface.userPrompt("Enter the server's domain:");
+		ConnectionToDB.setDomain(domain);
+		String port = userInterface.userPrompt("Enter the server's port number:");
+		ConnectionToDB.setPort(Integer.parseInt(port));
+		String username = userInterface.userPrompt("Enter the username:");
+		ConnectionToDB.setUsername(username);
+		String password = userInterface.userPrompt("Enter the password:");
+		ConnectionToDB.setPassword(password);
+		String schema = userInterface.userPrompt("Enter the schema:");
+		ConnectionToDB.setSchema(schema);
+		//creates the users-table in case the server doesn't have it yet.
+		UserDAO.createUsersTable();
+	}
+
+
+	public void createNewUserProcedure() {
+		if(localUser!=null) {
+			localUser.logout();
+		}
+		String newUserId = userInterface.userPrompt("choose a new user id:");
+		User user = new User(newUserId);
+		String newPassword = userInterface.userPrompt("choose a new password:");
+		user.createUser(newPassword);
+		userInterface.userMessage("now log in with the credentials you just chose:");
+		setLocalUser();
+		passwordLoop();
+	}
+
+
 
 	@Override
 	public void update(ArrayList<Message> messages) {
@@ -206,8 +260,7 @@ public class Session implements UserListener{
 			userInterface.exitConversation(ConversationManager.getInstance().getConversations());
 			break;
 		case LOGGING_OUT:
-			setLocalUser();
-			passwordLoop();
+			UserManager.getInstance().deleteLocalUser();
 			break;
 
 		}

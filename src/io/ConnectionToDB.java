@@ -27,9 +27,9 @@ public class ConnectionToDB {
 	static private String schema;
 	static private String DBURL;
 
-
-	static private ConfigFile connConfig;
-	static private String CONFIGFILE_PATH = "res/settings/netConfig";
+	
+	static final private String CONFIGFILE_PATH = "res/settings/netConfig";
+	static private ConfigFile connConfig = new ConfigFile(CONFIGFILE_PATH);
 	
 	
 	//checks if a connection is already open
@@ -68,7 +68,6 @@ public class ConnectionToDB {
 		}
 		
 		//else, retreive config settings from config file
-		connConfig = new ConfigFile(CONFIGFILE_PATH);
 		domain = connConfig.get("domain");
 		port = Integer.parseInt(connConfig.get("port"));
 		username = connConfig.get("username");
@@ -88,7 +87,52 @@ public class ConnectionToDB {
 	}
 	
 	
-
+	/**
+	 * The IP address or equivalent DNS of the sql-server. 
+	 * @param domain
+	 */
+	public static void setDomain(String domain) {
+		connConfig.put("domain", domain);
+	}
+	
+	
+	/**
+	 * The port at which the server makes this service available.
+	 * @param port
+	 */
+	public static void setPort(int port) {
+		connConfig.put("port", port+"");
+	}
+	
+	/**
+	 * The username of the user accessing the DB.
+	 * @param username
+	 */
+	public static void setUsername(String username) {
+		connConfig.put("username", username);
+	}
+	
+	/**
+	 * The user's password.
+	 * @param password
+	 */
+	public static void setPassword(String password) {
+		connConfig.put("password", password);
+	}
+	
+	
+	/**
+	 * The schema that contains the necessary tables.
+	 * @param schema
+	 */
+	public static void setSchema(String schema) {
+		connConfig.put("schema",schema);
+	}
+	
+	
+	
+	
+	
 	
 	
 	

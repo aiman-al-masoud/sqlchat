@@ -1,0 +1,17 @@
+help: displays this help text.
+
+exit: terminates the program.
+
+logout: forgets the last-used user id.
+
+login: asks you for your user id and password.
+
+ls: lists the available conversations. (only when logged in).
+
+open [name_of_conversation]: opens a conversation. (only when logged in).
+
+config: allows you to interactively reconfigure the connection to the DB-server.
+
+end: ends a conversation. (only when inside of a conversation).
+
+signup: lets you pick a new username and password. 
