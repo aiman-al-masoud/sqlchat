@@ -113,7 +113,7 @@ public class Shell implements SessionListener{
 	 */
 	@Override
 	public void displayHelp() {
-		System.out.println(FileIO.read("res/settings/shellHelp"));
+		System.out.println(FileIO.read("res/documentation/shellHelp"));
 	}
 
 
