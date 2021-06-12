@@ -9,7 +9,7 @@ You can create an account online for a remote server (sometimes even for free),
 or set your own mysql server on your personal computer*.
 
 After you create the database, however you decide to do that, you will need to make sure that you have these
-4 pieces of information at your disposal:
+4 pieces of information readily at your disposal:
 
 ### domain : 
 this could be your IP, or a domain name for an online mysql hosting service. 
