@@ -170,6 +170,10 @@ public class Session implements UserListener{
 			//clears the screen
 			userInterface.userMessage("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 			break;
+		case "RM":
+			//deletes a conversation
+			ConversationManager.getInstance().removeConversation(command.split("\\s+")[1].trim());
+			break;
 		default:
 			//displays default message.
 			userInterface.userMessage("'"+firstArgument+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");

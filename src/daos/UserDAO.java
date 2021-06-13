@@ -98,6 +98,13 @@ public class UserDAO {
 
 	}
 
+	
+	
+	
+	
+	
+	
+	
 
 	/**
 	 * Check if a password entered by the user is the same as the one stored on the server.

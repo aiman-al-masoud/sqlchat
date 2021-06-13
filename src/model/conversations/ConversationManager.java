@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import model.users.User;
 
 public class ConversationManager {
 	
@@ -34,14 +33,28 @@ public class ConversationManager {
 	}
 	
 	
-	public Conversation getConversation(String otherUsersName) {
+	public Conversation getConversation(String conversationId) {
 		
-		Conversation conv = conversationsMap.get(otherUsersName);
+		Conversation conv = conversationsMap.get(conversationId);
 		if(conv==null) {
-			conv = new Conversation(otherUsersName);
+			conv = new Conversation(conversationId);
+			conversationsMap.put(conversationId, conv);
 		}
 		return conv;
 	}
+	
+	
+	
+	public void removeConversation(String conversationId) {
+		
+		try {
+			Conversation toBeRemoved = getConversation(conversationId);
+			conversationsMap.remove(conversationId);
+			toBeRemoved.delete();
+		}catch(Exception e) {	
+		}
+	}
+	
 	
 	
 	public ArrayList<Conversation> getConversations(){

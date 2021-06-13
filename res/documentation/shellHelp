@@ -18,6 +18,8 @@ LS: lists the available conversations. (only when logged in).
 
 OPEN [name_of_conversation]: opens a conversation. (only when logged in).
 
+RM [name_of_conversation]: removes a conversation.
+
 END: ends a conversation. (only when inside of a conversation).
 
 CHKEY: changes the key-pair associated to the current account, and overwrites the old encrypter object.
