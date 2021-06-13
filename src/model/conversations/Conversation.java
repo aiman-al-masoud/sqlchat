@@ -12,22 +12,22 @@ public class Conversation extends File{
 
 	public static File conversationsDir = new File("res"+File.separator+"conversations");
 	ArrayList<Message> messages;
-	User localUser;
+	String otherUser;
+
 	
 	
-	User otherUser;
-
-
-	public Conversation(User otherUser) {
-		super(conversationsDir.getPath()+File.separator+otherUser.getId());
-		
+	public Conversation(String otherUser) {
+		super(conversationsDir.getPath()+File.separator+otherUser);
 		this.otherUser  = otherUser;
-		
 		messages = new ArrayList<Message>();
 		if(!exists()) {
 			create();
 		}
 		loadMessages();
+		
+
+		
+		
 	}
 
 
@@ -50,9 +50,6 @@ public class Conversation extends File{
 			appendMessage(newMessage);
 		}
 	}
-	
-	
-	
 
 
 	/**
@@ -92,32 +89,22 @@ public class Conversation extends File{
 
 	
 	public String getId() {
-		return otherUser.getId();
+		return otherUser;
 	}
 
-	
-	
 	
 
 
 	@Override
 	public String toString() {
-		
-		
-		return otherUser.getId();
+		return getId();
 	}
 
 	
 	
 
 
-	/**
-	 * Tester
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-	}
+	
 
 	
 	

@@ -16,7 +16,7 @@ public class ConversationManager {
 	private ConversationManager() {
 		conversationsMap = new HashMap<String, Conversation>();
 		for(File file : Conversation.conversationsDir.listFiles()) {
-			conversationsMap.put(file.getName(), new Conversation(new User(file.getName())));
+			conversationsMap.put(file.getName(), new Conversation(file.getName()));
 		}
 	}
 	
@@ -32,7 +32,7 @@ public class ConversationManager {
 		
 		Conversation conv = conversationsMap.get(otherUsersName);
 		if(conv==null) {
-			conv = new Conversation(new User(otherUsersName));
+			conv = new Conversation(otherUsersName);
 		}
 		return conv;
 	}
