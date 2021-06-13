@@ -1,5 +1,6 @@
 package model.controller;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import daos.UserDAO;
@@ -75,6 +76,10 @@ public class Session implements UserListener{
 
 
 	public Session() {
+		
+		//if necessary
+		createSettingsDir();
+		
 		//get the current user 
 		localUser = UserManager.getInstance().getLocalUser();
 
@@ -241,6 +246,19 @@ public class Session implements UserListener{
 	}
 
 
+	/**
+	 * Creates the settings directory if it doesn't exist yet.
+	 */
+	private static void createSettingsDir() {
+		//create the settings dir if it doesn't exist (thank you so much git)
+		File settings = new File("res/settings");
+		if(!settings.exists()) {
+			settings.mkdir();
+		}
+	}
+
+
+
 
 	@Override
 	public void update(ArrayList<Message> messages) {
@@ -265,6 +283,8 @@ public class Session implements UserListener{
 
 		}
 	}
+
+
 
 
 
