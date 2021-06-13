@@ -68,16 +68,17 @@ public class EncrypterBuilder {
 	}
 
 	
-	public static EncrypterIF load(String pathname) {
+	public EncrypterIF load(String pathname) {
 		try {
 			ObjectInputStream objInputStream = new ObjectInputStream(new FileInputStream(new File(pathname)));
-			return (EncrypterIF)objInputStream.readObject();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			EncrypterIF result = (EncrypterIF)objInputStream.readObject();
+			objInputStream.close();
+			return result;
+		} catch (ClassNotFoundException | IOException e) {
+			//e.printStackTrace();
 		}
-		return null;
+		
+		return getNewEncrypter();
 	}
 
 
