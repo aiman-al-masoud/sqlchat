@@ -22,7 +22,7 @@ public class Message {
 			String[] parts = messageString.split(";");
 			long timeSent = Long.parseLong(parts[0].trim());
 			String senderId = parts[1].trim();
-			String message = parts[2].trim();
+			String message = parts.length>2? parts[2].trim() : ""; //in case of an empty message
 			return new Message(timeSent, senderId, message);
 		}catch(NumberFormatException e) {
 

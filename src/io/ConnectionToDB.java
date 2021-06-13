@@ -73,7 +73,7 @@ public class ConnectionToDB {
 		username = connConfig.get("username");
 		password = connConfig.get("password");
 		schema = connConfig.get("schema");
-		DBURL = "jdbc:mysql://"+domain+":"+port+"/"+schema;
+		DBURL = "jdbc:mysql://"+domain+":"+port+"/"+schema+"?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 
 		
 		//connection still has to be opened, do it
