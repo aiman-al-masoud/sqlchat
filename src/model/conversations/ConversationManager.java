@@ -21,6 +21,12 @@ public class ConversationManager {
 	}
 	
 	public static ConversationManager getInstance() {
+		
+		//create the conversations dir if it doesn't exist yet
+		if(!Conversation.conversationsDir.exists()) {
+			Conversation.conversationsDir.mkdir();
+		}
+		
 		if(instance==null) {
 			instance = new ConversationManager();
 		}
