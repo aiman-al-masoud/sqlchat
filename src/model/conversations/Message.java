@@ -60,8 +60,6 @@ public class Message {
 			prettyMessage+="["+senderId+"]: ";
 		}
 		
-		
-		
 		return prettyMessage+message;
 	}
 

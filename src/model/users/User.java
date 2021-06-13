@@ -40,7 +40,7 @@ public class User {
 	 * The current conversation that the user is in
 	 */
 	Conversation currentConversation;
-	
+
 	/**
 	 * This User's current encrypter
 	 */
@@ -78,7 +78,7 @@ public class User {
 		return id;
 	}
 
-	
+
 	/**
 	 * Is the user currently logged in?
 	 * @return
@@ -86,10 +86,10 @@ public class User {
 	public boolean isLoggedIn() {
 		return loggedIn;
 	}
-	
-	
-	
-	
+
+
+
+
 	/**
 	 * Log the user in after they input the right password.
 	 * @param passwordAttempt
@@ -123,15 +123,15 @@ public class User {
 	 */
 	public void logout() {
 		loggedIn = false;
-		
+
 		//notify listeners
 		for(UserListener listener : listeners) {
 			listener.updateStatus(UserStatus.LOGGING_OUT, null);
 			UserManager.getInstance().deleteLocalUser();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Sends a message to the current conversation.
 	 * Only works if this user is logged in.
@@ -146,9 +146,6 @@ public class User {
 			//create a message object
 			Message toBeSent = new Message(System.currentTimeMillis(), this.id, message);
 
-			//append the message to the current conversation
-			currentConversation.appendMessage(toBeSent);
-
 			//notify listeners!
 			ArrayList<Message> messages = new ArrayList<Message>();
 			messages.add(toBeSent);
@@ -156,19 +153,8 @@ public class User {
 				listener.update(messages);
 			}
 
+			this.currentConversation.sendMessage(message);
 
-			//get the recipient's public key
-			String encryptionKey = UserDAO.getPublicKey(currentConversation.getId());
-			//if the recipient DOES have an encryption key:
-			if(encryptionKey!=null) {
-				//set it as the encryption key
-				encrypter.setEncryptionKey(encryptionKey.split("\\s+"));
-				//encrypt the message
-				message = encrypter.encrypt(message);
-			}
-
-			//send the message to the recipient
-			MessageDAO.messageUser(currentConversation.getId(), this, message);
 		}
 	}
 
@@ -201,9 +187,9 @@ public class User {
 			}
 
 			//change my public key, so that the next time I get sent messages, those new messages are encrypted with a different key.
-			if(incomingMessages.size()!=0) {
-				changeEncrypter();
-			}
+			//if(incomingMessages.size()!=0) {
+			//changeEncrypter();
+			//}
 
 		}
 
@@ -305,10 +291,13 @@ public class User {
 	 */
 	public void changeEncrypter() {
 
-		//get a new encrypter 
-		encrypter = EncrypterBuilder.getInstance().getNewEncrypter();
-		//change the public key on the DB.
-		UserDAO.registerNewPublicKey(this);
+		if(loggedIn) {
+			//get a new encrypter 
+			encrypter = EncrypterBuilder.getInstance().getNewEncrypter();
+			//change the public key on the DB.
+			UserDAO.registerNewPublicKey(this);
+		}
+
 	}
 
 

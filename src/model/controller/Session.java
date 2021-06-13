@@ -161,6 +161,15 @@ public class Session implements UserListener{
 			//lets you pick a new user id and password. 
 			createNewUserProcedure();
 			break;
+		case "CHKEY":	
+			//changes the public key
+			localUser.changeEncrypter();
+			this.userInterface.userMessage("NEW PUBLIC KEY: "+localUser.getPublicKey());
+			break;
+		case "CLS":
+			//clears the screen
+			userInterface.userMessage("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+			break;
 		default:
 			//displays default message.
 			userInterface.userMessage("'"+firstArgument+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");

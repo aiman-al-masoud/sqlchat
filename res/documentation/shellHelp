@@ -1,17 +1,27 @@
-help: displays this help text.
 
-exit: terminates the program.
+-----HELP-------------------------------------------------
+----(ALL OF THESE COMMANDS ARE CASE-INSENSITIVE)------------
 
-logout: forgets the last-used user id.
+HELP: displays this help text.
 
-login: asks you for your user id and password.
+EXIT: terminates the program.
 
-ls: lists the available conversations. (only when logged in).
+CONFIG: allows you to interactively reconfigure the connection to the DB-server.
 
-open [name_of_conversation]: opens a conversation. (only when logged in).
+SIGNUP: lets you pick a new username and password. 
 
-config: allows you to interactively reconfigure the connection to the DB-server.
+LOGIN: asks you for your user id and password. It will NOT keep you logged in once you terminate the program.
 
-end: ends a conversation. (only when inside of a conversation).
+LOGOUT: forgets the last-used user id.
 
-signup: lets you pick a new username and password. 
+LS: lists the available conversations. (only when logged in).
+
+OPEN [name_of_conversation]: opens a conversation. (only when logged in).
+
+END: ends a conversation. (only when inside of a conversation).
+
+CHKEY: changes the key-pair associated to the current account, and overwrites the old encrypter object.
+
+CLS: clears the screen.
+
+----------------------------------------------------
