@@ -9,7 +9,7 @@ You can create an account online for a remote server (sometimes even for free),
 or set your own mysql server on your personal computer (*1)
 
 After you create the database, however you decide to do that, you will need to make sure that you have these
-4 pieces of information readily at your disposal:
+five pieces of information readily at your disposal:
 
 ### domain : 
 this could be your IP, or a domain name for an online mysql hosting service. 
@@ -29,11 +29,11 @@ the schema all of the tables are gonna spawn in.
 
 ## configuring the connection
 
-When you do have these four pieces of information, you can run the jar with the following argument:
+When you do have these five pieces of information, you can run the jar with the following argument:
 
 java -jar sqlchat.jar config
 
-This will prompt you to enter the four parameters step by step.
+This will prompt you to enter the five parameters step by step.
 
 Alternatively, you can manually create and fill the res/settings/netConfig file, filling 
 it up with the information in this format:
@@ -62,8 +62,8 @@ java -jar sqlchat.jar
 It will prompt you to enter your password.
 
 ## Connecting to others:
-You're done! Now you can send the 4 configuration parameters to a friend (through some safe means, possibly 
-on a piece of paper), and after they're done setting up the app and creating a new account, you two
+You're done! Now you can send the five configuration parameters to a friend through some other safe means, 
+(possibly on a piece of paper), and after they're done setting up the app and creating a new account, you two
 can start chatting! Your conversations are NOT kept on the server once you download them, and, in the 
 meanwhile, they're encrypted with 300-digit (decimal) RSA.
 
