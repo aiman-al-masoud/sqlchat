@@ -174,6 +174,13 @@ public class Session implements UserListener{
 			//deletes a conversation
 			ConversationManager.getInstance().removeConversation(command.split("\\s+")[1].trim());
 			break;
+		case "LS-U":
+			//lists all of the registered accounts on this server
+			this.userInterface.userMessage("ALL OF THE ACCOUNTS ON THIS SERVER:");
+			for(String user : UserDAO.selectAll()) {
+				userInterface.userMessage(user);
+			}
+			break;
 		default:
 			//displays default message.
 			userInterface.userMessage("'"+firstArgument+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");

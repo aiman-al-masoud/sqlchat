@@ -25,11 +25,11 @@ public class UserDAO {
 	 * Get all of the usernames on the server.
 	 * @return
 	 */
-	public static ArrayList<User> selectAll() {
+	public static ArrayList<String> selectAll() {
 
 		String query = "select `id` from Users";
 
-		ArrayList<User> result = new ArrayList<User>();
+		ArrayList<String> result = new ArrayList<String>();
 
 		try {
 			connection = ConnectionToDB.startConnection();
@@ -37,7 +37,7 @@ public class UserDAO {
 			ResultSet resultSet = statement.executeQuery(query); //execute only works for read-only queries
 			while(resultSet.next()) {
 				//one record for each iteration of the loop. getString(n) starts counting from n = 1 onwards!!
-				result.add(new User(resultSet.getString(1)));
+				result.add(resultSet.getString(1));
 			}
 
 		}catch(SQLException e) {
@@ -99,10 +99,16 @@ public class UserDAO {
 	}
 
 	
-	
-	
-	
-	
+	///////////////////////////////////////////
+	/*
+	public void deleteUser(String userId) {
+		
+	}
+	public boolean userExists(String userId) {
+		return false;
+	}
+	*/
+	////////////////////////////////
 	
 	
 
