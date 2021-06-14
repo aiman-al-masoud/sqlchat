@@ -98,18 +98,56 @@ public class UserDAO {
 
 	}
 
-	
-	///////////////////////////////////////////
-	/*
-	public void deleteUser(String userId) {
+	/**
+	 * Deletes a user account from the server.	
+	 * @param userId
+	 * @return
+	 */
+	public static boolean deleteUser(String userId) {
 		
-	}
-	public boolean userExists(String userId) {
+		//prevent the main table from getting deleted
+		if(userId.equals("Users")) {
+			return false;
+		}
+		
+		try {
+			String sql = "DELETE FROM `Users` WHERE id = ?";
+			connection = ConnectionToDB.startConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, userId);
+			preparedStatement.executeUpdate();
+			
+			sql = "DROP TABLE IF EXISTS "+userId;
+			Statement statement  = connection.createStatement();
+			statement.executeUpdate(sql);
+			
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		return false;
 	}
-	*/
-	////////////////////////////////
 	
+	
+	public static boolean userExists(String userId) {
+		
+		String sql = "SELECT * FROM `Users` WHERE id = ?";
+		
+		try {
+			connection = ConnectionToDB.startConnection();
+			PreparedStatement preparedStatement;
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setString(1, userId);
+			ResultSet results = preparedStatement.executeQuery();
+			return results.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+		
 	
 
 	/**

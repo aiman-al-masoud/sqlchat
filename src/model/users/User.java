@@ -56,8 +56,13 @@ public class User {
 	 */
 	SHA256 hasher;
 
+	
+	/**
+	 * Periodically pulls messages from the server.
+	 */
+	Timer pullTaskTimer;
 
-
+	
 	public User(String id) {
 		//set this User's id.
 		this.id = id;
@@ -124,6 +129,8 @@ public class User {
 	public void logout() {
 		loggedIn = false;
 
+		this.stopPullingMessages();
+		
 		//notify listeners
 		for(UserListener listener : listeners) {
 			listener.updateStatus(UserStatus.LOGGING_OUT, null);
@@ -185,12 +192,6 @@ public class User {
 			for(UserListener listener : listeners) {
 				listener.update(incomingMessages);
 			}
-
-			//change my public key, so that the next time I get sent messages, those new messages are encrypted with a different key.
-			//if(incomingMessages.size()!=0) {
-			//changeEncrypter();
-			//}
-
 		}
 
 	}
@@ -205,7 +206,32 @@ public class User {
 		UserDAO.createUser(id, encryptedPassword);
 		UserDAO.registerNewPublicKey(this);
 	}
+	
+	/**
+	 * Delete this user from the server
+	 * @param password
+	 */
+	public boolean deleteUser(String password) {
+		
+		boolean success = false;
+		if(UserDAO.authenticate(this, hasher.encrypt(password))) {
+			this.stopPullingMessages();
+			this.loggedIn = false;
+			success = UserDAO.deleteUser(id);
+		}
+		
+		return success;
+	}
+	
 
+	/**
+	 * Checks if this user exists on the server.
+	 */
+	public boolean exists() {
+		return UserDAO.userExists(this.id);	
+	}
+	
+	
 	/**
 	 * Set a new conversation as the current conversation.
 	 * @param conversation
@@ -321,12 +347,21 @@ public class User {
 		};
 
 		//start the timer, poll the server every 1 second for new messages.
-		Timer timer = new Timer();
+		pullTaskTimer = new Timer();
 		long millisecs = 1000;
-		timer.schedule(task, 0, millisecs);
+		pullTaskTimer.schedule(task, 0, millisecs);
 
+		
 	}
 
+	
+	/**
+	 * Stops pulling messages 
+	 */
+	public void stopPullingMessages() {
+		pullTaskTimer.cancel();
+	}
+	
 
 
 

@@ -181,6 +181,18 @@ public class Session implements UserListener{
 				userInterface.userMessage(user);
 			}
 			break;
+		case "DELACC":
+			//deletes the current account
+			if(localUser.isLoggedIn()) {
+				String response = userInterface.userPrompt("Are you sure you want to delete this account? (y/n)");
+				if(response.toUpperCase().equals("N")) {
+					return;
+				}
+				String passwordAttempt = userInterface.userPrompt("Confirm your password:");
+				boolean success = localUser.deleteUser(passwordAttempt);
+				userInterface.userMessage("Deleted: "+success);
+			}
+			break;
 		default:
 			//displays default message.
 			userInterface.userMessage("'"+firstArgument+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");
@@ -210,8 +222,12 @@ public class Session implements UserListener{
 
 
 	public void setLocalUser() {
-		String userId = userInterface.userPrompt("Enter your user id:");
-		localUser = new User(userId);
+		String userId;
+		do {
+			userId = userInterface.userPrompt("Enter your user id:");
+			localUser = new User(userId);
+		}while(!localUser.exists());
+		
 		UserManager.getInstance().saveLocalUser(localUser);
 		//add this Session to the User's listeners 
 		localUser.addListener(this);

@@ -78,6 +78,7 @@ public class ConnectionToDB {
 		
 		//connection still has to be opened, do it
 		try {
+
 			connection = DriverManager.getConnection(DBURL, username, password);
 		}catch(Exception e ) {
 			e.printStackTrace();
