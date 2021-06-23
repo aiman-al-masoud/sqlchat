@@ -9,8 +9,8 @@ import daos.UserDAO;
 import io.FileIO;
 import model.encryption.EncrypterBuilder;
 import model.encryption.EncrypterIF;
-import model.users.User;
-import model.users.UserManager;
+import model.user.User;
+import model.user.UserManager;
 
 /**
  * The id of a conversation is the cocatenation of the names
@@ -171,20 +171,6 @@ public class Conversation extends File{
 	
 
 	
-	/**
-	 * Tester
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		//Conversation c = new Conversation("capra");
-		//c.addParticipant("puma");
-
-		//System.out.println(c.getPath());
-		//System.out.println(c.getId());
-		
-		//c.sendMessage("monnsdsdm?!");
-	}
-
 	
 	
 	

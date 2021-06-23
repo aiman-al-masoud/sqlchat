@@ -1,4 +1,4 @@
-package model.users;
+package model.user;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -56,13 +56,13 @@ public class User {
 	 */
 	SHA256 hasher;
 
-	
+
 	/**
 	 * Periodically pulls messages from the server.
 	 */
 	Timer pullTaskTimer;
 
-	
+
 	public User(String id) {
 		//set this User's id.
 		this.id = id;
@@ -91,8 +91,6 @@ public class User {
 	public boolean isLoggedIn() {
 		return loggedIn;
 	}
-
-
 
 
 	/**
@@ -130,10 +128,10 @@ public class User {
 		loggedIn = false;
 
 		this.stopPullingMessages();
-		
+
 		//notify listeners
 		for(UserListener listener : listeners) {
-			listener.updateStatus(UserStatus.LOGGING_OUT, null);
+			listener.onLoggingOut();
 			UserManager.getInstance().deleteLocalUser();
 		}
 	}
@@ -157,7 +155,7 @@ public class User {
 			ArrayList<Message> messages = new ArrayList<Message>();
 			messages.add(toBeSent);
 			for(UserListener listener : listeners) {
-				listener.update(messages);
+				listener.onMessages(messages);
 			}
 
 			this.currentConversation.sendMessage(message);
@@ -190,7 +188,7 @@ public class User {
 
 			//notify listeners!
 			for(UserListener listener : listeners) {
-				listener.update(incomingMessages);
+				listener.onMessages(incomingMessages);
 			}
 		}
 
@@ -206,23 +204,23 @@ public class User {
 		UserDAO.createUser(id, encryptedPassword);
 		UserDAO.registerNewPublicKey(this);
 	}
-	
+
 	/**
 	 * Delete this user from the server
 	 * @param password
 	 */
 	public boolean deleteUser(String password) {
-		
+
 		boolean success = false;
 		if(UserDAO.authenticate(this, hasher.encrypt(password))) {
 			this.stopPullingMessages();
 			this.loggedIn = false;
 			success = UserDAO.deleteUser(id);
 		}
-		
+
 		return success;
 	}
-	
+
 
 	/**
 	 * Checks if this user exists on the server.
@@ -230,8 +228,8 @@ public class User {
 	public boolean exists() {
 		return UserDAO.userExists(this.id);	
 	}
-	
-	
+
+
 	/**
 	 * Set a new conversation as the current conversation.
 	 * @param conversation
@@ -241,7 +239,7 @@ public class User {
 
 		//notify listeners!
 		for(UserListener listener : listeners) {
-			listener.updateStatus(UserStatus.ENTERING_CONVERSATION,  new Object[] {currentConversation});
+			listener.onEnteredConversation(conversation);
 		}
 
 	}
@@ -254,7 +252,7 @@ public class User {
 
 		//notify listeners!
 		for(UserListener listener : listeners) {
-			listener.updateStatus(UserStatus.EXITING_CONVERSATION,  null);
+			listener.onExitedConversation();
 		}
 	}
 
@@ -290,14 +288,6 @@ public class User {
 		listeners.remove(listener);
 	}
 
-	/**
-	 * This interface is meant to be implemented by UI
-	 * classes that have to display up-to-date info about the User.
-	 */
-	public interface UserListener{
-		public void update(ArrayList<Message> messages);
-		public void updateStatus(UserStatus status, Object[] objects);
-	}
 
 	/**
 	 * Modify the password stored on the server.
@@ -327,7 +317,6 @@ public class User {
 	}
 
 
-
 	/**
 	 * Start polling the server every x seconds for new messages.
 	 */
@@ -351,17 +340,16 @@ public class User {
 		long millisecs = 1000;
 		pullTaskTimer.schedule(task, 0, millisecs);
 
-		
 	}
 
-	
+
 	/**
 	 * Stops pulling messages 
 	 */
 	public void stopPullingMessages() {
 		pullTaskTimer.cancel();
 	}
-	
+
 
 
 

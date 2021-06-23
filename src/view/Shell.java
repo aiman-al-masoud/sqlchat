@@ -3,9 +3,9 @@ package view;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import controller.Session;
+import controller.SessionListener;
 import io.FileIO;
-import model.controller.Session;
-import model.controller.Session.SessionListener;
 import model.conversations.Conversation;
 import model.conversations.Message;
 

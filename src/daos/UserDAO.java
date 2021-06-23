@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 
 import io.ConnectionToDB;
-import model.users.User;
+import model.user.User;
 
 
 public class UserDAO {
@@ -52,9 +52,6 @@ public class UserDAO {
 	}
 	
 	
-	
-	
-
 
 	/**
 	 * Creates a new user by adding their entry to the 

@@ -1,4 +1,4 @@
-package model.users;
+package model.user;
 
 import java.io.File;
 import java.io.IOException;

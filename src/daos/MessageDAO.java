@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import io.ConnectionToDB;
 import model.conversations.Message;
-import model.users.User;
+import model.user.User;
 
 public class MessageDAO {
 

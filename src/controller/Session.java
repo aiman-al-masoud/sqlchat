@@ -1,4 +1,4 @@
-package model.controller;
+package controller;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -8,10 +8,9 @@ import io.ConnectionToDB;
 import model.conversations.Conversation;
 import model.conversations.ConversationManager;
 import model.conversations.Message;
-import model.users.User;
-import model.users.User.UserListener;
-import model.users.UserManager;
-import model.users.UserStatus;
+import model.user.User;
+import model.user.UserListener;
+import model.user.UserManager;
 
 
 /**
@@ -28,7 +27,7 @@ public class Session implements UserListener{
 
 	/**
 	 * The listeners that obeys this Session.
-	 * (Probably a User Interface Objects)
+	 * (Probably User Interface Objects)
 	 */
 	SessionListener userInterface;
 
@@ -37,26 +36,6 @@ public class Session implements UserListener{
 	 * To keep track of the user.
 	 */
 	User localUser;
-
-
-	/**
-	 * Has to be implemented by any User interface.
-	 */
-	public interface SessionListener{
-
-		public void displayHelp();
-		public void listConversations(ArrayList<Conversation> conversations);
-		public void exitConversation(ArrayList<Conversation> conversations);
-		public void printMessages(ArrayList<Message> messages);
-		public void mainLoop();
-		public void conversationLoop(Conversation conversation);
-		public void welcomeUser(String userId);
-		public String userPrompt(String message);
-		public void userMessage(String message);
-
-
-	}
-
 
 	/**
 	 * Adds a new listener.
@@ -220,20 +199,31 @@ public class Session implements UserListener{
 		return localUser.isInConversation();
 	}
 
-
+	
+	/**
+	 * This procedure indirectly calls the UI to get the username.
+	 */
 	public void setLocalUser() {
 		String userId;
+		
+		//tell the user interface to fetch a user name
 		do {
 			userId = userInterface.userPrompt("Enter your user id:");
 			localUser = new User(userId);
+			
+		//while the user doesn't exist, keep on asking for a new username	
 		}while(!localUser.exists());
 		
+		//save the new local user
 		UserManager.getInstance().saveLocalUser(localUser);
 		//add this Session to the User's listeners 
 		localUser.addListener(this);
 	}
 
 
+	/**
+	 * This procedure indirectly calls the user interface to retrieve a password attempt from the user
+	 */
 	public void passwordLoop() {
 		String passwordAttempt;
 		do {
@@ -252,6 +242,11 @@ public class Session implements UserListener{
 		userInterface.welcomeUser(localUser.getId());
 	}
 
+	
+	
+	/**
+	 * This procedure indirectly uses the userinterface to get all of the parameters from the user
+	 */
 	public void setConnectionParametersProcedure() {
 		String domain = userInterface.userPrompt("Enter the server's domain:");
 		ConnectionToDB.setDomain(domain);
@@ -263,6 +258,7 @@ public class Session implements UserListener{
 		ConnectionToDB.setPassword(password);
 		String schema = userInterface.userPrompt("Enter the schema:");
 		ConnectionToDB.setSchema(schema);
+		
 		//creates the users-table in case the server doesn't have it yet.
 		UserDAO.createUsersTable();
 	}
@@ -292,45 +288,32 @@ public class Session implements UserListener{
 			settings.mkdir();
 		}
 	}
-
-
-
+	
 
 	@Override
-	public void update(ArrayList<Message> messages) {
+	public void onEnteredConversation(Conversation conversation) {
+		userInterface.conversationLoop(conversation);
+	}
+
+	@Override
+	public void onExitedConversation() {
+		userInterface.exitConversation(ConversationManager.getInstance().getConversations());		
+	}
+
+	@Override
+	public void onLoggingOut() {
+		UserManager.getInstance().deleteLocalUser();
+	}
+
+	@Override
+	public void onLoggingIn() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onMessages(ArrayList<Message> messages) {
 		userInterface.printMessages(messages);
 	}
-
-	@Override
-	public void updateStatus(UserStatus status, Object[] objects) {
-
-		switch(status) {
-
-		case ENTERING_CONVERSATION:
-			Conversation currentConv = (Conversation)objects[0];
-			userInterface.conversationLoop(currentConv);
-			break;
-		case EXITING_CONVERSATION:
-			userInterface.exitConversation(ConversationManager.getInstance().getConversations());
-			break;
-		case LOGGING_OUT:
-			UserManager.getInstance().deleteLocalUser();
-			break;
-
-		}
-	}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

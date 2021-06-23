@@ -2,7 +2,7 @@ package model.conversations;
 
 import java.util.Date;
 
-import model.users.UserManager;
+import model.user.UserManager;
 
 public class Message {
 
