@@ -161,7 +161,7 @@ public class Conversation extends File{
 		this.appendMessage(new Message(System.currentTimeMillis(), sender.getId(), message));
 		
 		for(String participant : participants) {
-			String publicKey = UserDAO.getPublicKey(participant);
+			String publicKey = UserDAO.getPublicKey(participant);			
 			encr.setEncryptionKey(new String[] {publicKey.split("\\s+")[0].trim(),  publicKey.split("\\s+")[1].trim()});
 			String encryptedMessage =  encr.encrypt(message);
 			MessageDAO.messageUser(participant, sender, encryptedMessage);

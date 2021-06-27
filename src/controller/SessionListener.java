@@ -17,7 +17,15 @@ public interface SessionListener{
 	public void mainLoop();
 	public void conversationLoop(Conversation conversation);
 	public void welcomeUser(String userId);
-	public String userPrompt(String message);
+	
+	
+	public void displayPrompt(UserPrompt userPrompt);
+
+	
+	public String waitForUserResponse(String message);
+	
+	
+	
 	public void userMessage(String message);
 
 

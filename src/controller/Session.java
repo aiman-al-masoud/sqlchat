@@ -55,10 +55,10 @@ public class Session implements UserListener{
 
 
 	public Session() {
-		
+
 		//if necessary
 		createSettingsDir();
-		
+
 		//get the current user 
 		localUser = UserManager.getInstance().getLocalUser();
 
@@ -73,11 +73,11 @@ public class Session implements UserListener{
 
 		//if no user is currently saved, ask for a userId		
 		if(localUser==null) {
-			setLocalUser();
+			attemptLogin();
 		}
 
 		//ask the user for their password 
-		passwordLoop();
+		askForPassword();
 
 		//start the thread that polls the remote server for incoming messages
 		localUser.startPullingMessages();
@@ -87,99 +87,80 @@ public class Session implements UserListener{
 	}
 
 
-	/**
-	 * Accepts a string-command and tells localUser what to do.
-	 * @param command
-	 */
 
-	public void runCommand(String command) {
+	public void runCommand(SessionServices serviceCode, String[] args) {
 
-		//switch on the first argument of the command
-		String firstArgument = command.split("\\s+")[0].toUpperCase().trim();
-		switch(firstArgument) {
-
-		case "EXIT":
+		switch(serviceCode) {
+		case CHKEY:
+			//changes the public key
+			localUser.changeEncrypter();
+			userInterface.userMessage("NEW PUBLIC KEY: "+localUser.getPublicKey());
+			break;
+		case CLS:
+			//clears the screen
+			userInterface.userMessage("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+			break;
+		case CONFIG:
+			setConnectionParametersProcedure();
+			break;
+		case DELACC:
+			confirmDeleteAccount();
+			break;
+		case EXIT:
 			//terminate the program with no error code.
 			System.exit(0);
-		case "LOGOUT":
+			break;
+		case HELP:
+			//display some help
+			userInterface.displayHelp();
+			break;
+		case LOGIN:
+			askForPassword();			
+			break;
+		case LOGOUT:
 			//log the current user out
 			localUser.logout();
 			break;
-		case "LOGIN":
-			//prompt the user to log in
-			if(!localUser.isLoggedIn()) {
-				setLocalUser();
-				passwordLoop();
-			}
-			break;
-		case "LS":
+		case LS:
 			//list the conversations
 			if(localUser.isLoggedIn()) {
 				userInterface.listConversations(ConversationManager.getInstance().getConversations());
 			}
 			break;
-		case "HELP":
-			//display some help
-			userInterface.displayHelp();
-			break;
-		case "OPEN":
-			//open a conversation
-			if(localUser.isLoggedIn()) {
-				Conversation conversation = ConversationManager.getInstance().getConversation(command.split("\\s+")[1].trim());
-				localUser.enterConversation(conversation);	
-			}
-			break;
-		case "CONFIG":
-			//logout, and prompt the user to enter the new connection-settings
-			if(localUser!=null) {
-				localUser.logout();
-			}
-			setConnectionParametersProcedure();
-			break;
-		case "SIGNUP":
-			//lets you pick a new user id and password. 
-			createNewUserProcedure();
-			break;
-		case "CHKEY":	
-			//changes the public key
-			localUser.changeEncrypter();
-			this.userInterface.userMessage("NEW PUBLIC KEY: "+localUser.getPublicKey());
-			break;
-		case "CLS":
-			//clears the screen
-			userInterface.userMessage("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-			break;
-		case "RM":
-			//deletes a conversation
-			ConversationManager.getInstance().removeConversation(command.split("\\s+")[1].trim());
-			break;
-		case "LS-U":
+		case LSU:
 			//lists all of the registered accounts on this server
 			this.userInterface.userMessage("ALL OF THE ACCOUNTS ON THIS SERVER:");
 			for(String user : UserDAO.selectAll()) {
 				userInterface.userMessage(user);
 			}
 			break;
-		case "DELACC":
-			//deletes the current account
+		case OPEN:
+			//open a conversation
 			if(localUser.isLoggedIn()) {
-				String response = userInterface.userPrompt("Are you sure you want to delete this account? (y/n)");
-				if(response.toUpperCase().equals("N")) {
-					return;
-				}
-				String passwordAttempt = userInterface.userPrompt("Confirm your password:");
-				boolean success = localUser.deleteUser(passwordAttempt);
-				userInterface.userMessage("Deleted: "+success);
+
+				Conversation conversation = ConversationManager.getInstance().getConversation(args[0].trim());
+				localUser.enterConversation(conversation);	
 			}
 			break;
-		default:
-			//displays default message.
-			userInterface.userMessage("'"+firstArgument+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");
+		case RM:
+			//deletes a conversation
+			ConversationManager.getInstance().removeConversation(args[0].trim());
 			break;
-
-		}
-
+		case SIGNUP:
+			createNewUserProcedure();
+			break;
+		default:
+		case NOTACMD:
+			userInterface.userMessage("'"+args[0]+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");
+			break;
+		case SENDMSG:
+			localUser.sendMessage(args[0]);
+			break;
+			
+			
+		}	
 	}
+
 
 
 	public void conversationCommand(String command) {
@@ -199,68 +180,51 @@ public class Session implements UserListener{
 		return localUser.isInConversation();
 	}
 
-	
+
 	/**
 	 * This procedure indirectly calls the UI to get the username.
 	 */
-	public void setLocalUser() {
-		String userId;
-		
-		//tell the user interface to fetch a user name
-		do {
-			userId = userInterface.userPrompt("Enter your user id:");
-			localUser = new User(userId);
-			
-		//while the user doesn't exist, keep on asking for a new username	
-		}while(!localUser.exists());
-		
-		//save the new local user
-		UserManager.getInstance().saveLocalUser(localUser);
-		//add this Session to the User's listeners 
-		localUser.addListener(this);
+	public void attemptLogin() {
+
+
+		UserPrompt userPrompt = new UserPrompt(SessionServices.LOGIN);
+
+		userPrompt.addPrompt("Enter your user id:");
+		userPrompt.addPrompt("Enter your user password:");
+
+		userInterface.displayPrompt(userPrompt);
 	}
 
 
 	/**
 	 * This procedure indirectly calls the user interface to retrieve a password attempt from the user
 	 */
-	public void passwordLoop() {
-		String passwordAttempt;
-		do {
-
-			passwordAttempt = userInterface.userPrompt("Enter your password:");	
-
-			//////extremely ugly part/////
-			if(passwordAttempt.toUpperCase().equals("LOGOUT")) {
-				UserManager.getInstance().deleteLocalUser();
-				System.exit(0);
-			}
-			////////////////////
-
-		}while(!localUser.logIn(passwordAttempt));
-
-		userInterface.welcomeUser(localUser.getId());
+	public void askForPassword() {
+		UserPrompt userPrompt = new UserPrompt(SessionServices.AUTHENTICATE);
+		userPrompt.addPrompt("Enter your password:");
+		userInterface.displayPrompt(userPrompt);
 	}
 
-	
-	
+
+
+
+
 	/**
 	 * This procedure indirectly uses the userinterface to get all of the parameters from the user
 	 */
 	public void setConnectionParametersProcedure() {
-		String domain = userInterface.userPrompt("Enter the server's domain:");
-		ConnectionToDB.setDomain(domain);
-		String port = userInterface.userPrompt("Enter the server's port number:");
-		ConnectionToDB.setPort(Integer.parseInt(port));
-		String username = userInterface.userPrompt("Enter the username:");
-		ConnectionToDB.setUsername(username);
-		String password = userInterface.userPrompt("Enter the password:");
-		ConnectionToDB.setPassword(password);
-		String schema = userInterface.userPrompt("Enter the schema:");
-		ConnectionToDB.setSchema(schema);
-		
-		//creates the users-table in case the server doesn't have it yet.
-		UserDAO.createUsersTable();
+
+		//create and set up a new user-prompt
+		UserPrompt userPrompt = new UserPrompt(SessionServices.CONFIG);
+		userPrompt.addPrompt("Enter the server's domain:");
+		userPrompt.addPrompt("Enter the server's port number:");
+		userPrompt.addPrompt("Enter the username:");
+		userPrompt.addPrompt("Enter the password:");
+		userPrompt.addPrompt("Enter the schema:");
+
+		//call the interface to display it
+		userInterface.displayPrompt(userPrompt);
+
 	}
 
 
@@ -268,28 +232,116 @@ public class Session implements UserListener{
 		if(localUser!=null) {
 			localUser.logout();
 		}
-		String newUserId = userInterface.userPrompt("choose a new user id:");
-		User user = new User(newUserId);
-		String newPassword = userInterface.userPrompt("choose a new password:");
-		user.createUser(newPassword);
-		userInterface.userMessage("now log in with the credentials you just chose:");
-		setLocalUser();
-		passwordLoop();
+
+		//create a userprompt
+		UserPrompt userPrompt = new UserPrompt(SessionServices.SIGNUP);
+		userPrompt.addPrompt("choose a new user id:");
+		userPrompt.addPrompt("choose a new password:");
+
+		//call the UI to display the userprompt
+		userInterface.displayPrompt(userPrompt);		
 	}
+
+
+
 
 
 	/**
-	 * Creates the settings directory if it doesn't exist yet.
+	 * Gets called back by the UI (SessionListener) when 
+	 * it's done getting input from user.
+	 * @param userInput
+	 * @param serviceCode
 	 */
-	private static void createSettingsDir() {
-		//create the settings dir if it doesn't exist (thank you so much git)
-		File settings = new File("res/settings");
-		if(!settings.exists()) {
-			settings.mkdir();
+	public void callback(String[] userInput, SessionServices serviceCode) {
+
+		switch(serviceCode) {
+
+		case CONFIG:
+
+			ConnectionToDB.setDomain(userInput[0].trim());
+			ConnectionToDB.setPort(Integer.parseInt(userInput[1].trim()));
+			ConnectionToDB.setUsername(userInput[2].trim());
+			ConnectionToDB.setPassword(userInput[3].trim());
+			ConnectionToDB.setSchema(userInput[4].trim());
+			//creates the users-table in case the server doesn't have it yet.
+			UserDAO.createUsersTable();
+
+			break;
+		case DELACC:
+
+			//if confirm delete = n, terminate
+			if(userInput[0].toUpperCase().trim().equals("N")) {
+				return;
+			}
+
+			boolean success = localUser.deleteUser(userInput[1]);
+			userInterface.userMessage("Deleted: "+success);
+
+			break;
+		case LOGIN:
+
+			String userId = userInput[0].trim();
+			String passwordAttempt = userInput[0];
+			User user = new User(userId);
+
+			//check if user exists on server
+			if(!user.exists()) {
+				userInterface.userMessage("user does not exist!");
+				return;
+			}
+
+			//check password 
+			success = user.logIn(passwordAttempt);
+			if(success) {
+				UserManager.getInstance().saveLocalUser(user);
+				userInterface.welcomeUser(userId);
+			}else {
+				userInterface.userMessage("wrong password!");
+			}
+
+			break;
+		case SIGNUP:
+			user = new User(userInput[0].trim());
+			user.createUser(userInput[1]);
+			userInterface.userMessage("account created successfully!");
+			break;
+		case AUTHENTICATE:
+			success = localUser.logIn(userInput[0]);
+			if(!success) {
+				askForPassword();
+			}
+
+			userInterface.welcomeUser(localUser.getId());
+			break;
+		default:
+			break;
+
 		}
+
 	}
+
+
+
+
+	public void confirmDeleteAccount() {
+
+		//just return if current user is not logged in
+		if(!localUser.isLoggedIn()) {
+			return;
+		}
+
+		UserPrompt userPrompt = new UserPrompt(SessionServices.DELACC);
+		userPrompt.addPrompt("Are you sure you want to delete this account? (y/n)");
+		userPrompt.addPrompt("Confirm your password:");
+		userInterface.displayPrompt(userPrompt);
+	}
+
+
+
+
 	
 
+	//USER LISTENER METHODS------------------
 	@Override
 	public void onEnteredConversation(Conversation conversation) {
 		userInterface.conversationLoop(conversation);
@@ -315,6 +367,23 @@ public class Session implements UserListener{
 		userInterface.printMessages(messages);
 	}
 
+	///////////////////
+	
 
+
+	/**
+	 * Creates the settings directory if it doesn't exist yet.
+	 */
+	private static void createSettingsDir() {
+		//create the settings dir if it doesn't exist (thank you so much git)
+		File settings = new File("res/settings");
+		if(!settings.exists()) {
+			settings.mkdir();
+		}
+	}
+
+
+	
+	
 
 }

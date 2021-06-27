@@ -1,10 +1,13 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
+import controller.AbstractUI;
+import controller.Command;
 import controller.Session;
-import controller.SessionListener;
+import controller.SessionServices;
 import io.FileIO;
 import model.conversations.Conversation;
 import model.conversations.Message;
@@ -19,7 +22,7 @@ import model.conversations.Message;
  *
  */
 
-public class Shell implements SessionListener{
+public class Shell extends AbstractUI{
 
 
 	/**
@@ -27,22 +30,48 @@ public class Shell implements SessionListener{
 	 */
 	Scanner scanner;
 
-	/**
-	 * The controller calls the methods of Shell, and/or gets called back by Shell. 
-	 */
-	Session controller;
-
+	
+	
 	public Shell(Session controller) {
-
-		//start listening to the controller
-		this.controller = controller;
-		controller.addListener(this);
-
+		super(controller);
+		
 		//get a new stdin scanner
 		scanner = new Scanner(System.in);
-
 	}
 
+	
+	
+	public static Command parseCommand(String commandText) {
+		
+		
+		String[] commandParts = commandText.split("\\s+");
+		String commandName = commandParts[0].toUpperCase();
+		
+		SessionServices commandCode;
+		try {
+			commandCode = SessionServices.valueOf(commandName);
+		}catch(IllegalArgumentException e) {
+			commandCode = SessionServices.NOTACMD;
+			String[] args = {commandParts[0]};
+			return new Command(commandCode, args);
+		}
+		
+		
+		String[] args;
+		if(commandParts.length == 1) {
+			args = new String[0];
+		}else {
+			args = Arrays.copyOfRange(commandParts, 1, commandParts.length);
+		}
+		
+	
+		
+		return new Command(commandCode, args);
+	}
+	
+	
+	
+	
 
 	/**
 	 * Wait for user input, then pass the arguments to the controller.
@@ -50,8 +79,9 @@ public class Shell implements SessionListener{
 	@Override
 	public void mainLoop() {
 		while(true) {
-			String command = scanner.nextLine();
-			controller.runCommand(command);
+			String commandText = scanner.nextLine();
+			Command command  = parseCommand(commandText);
+			session.runCommand(command.serviceCode, command.args);
 		}
 	}
 
@@ -74,15 +104,15 @@ public class Shell implements SessionListener{
 	 */
 	@Override
 	public void conversationLoop(Conversation conversation) {
-		//print all of the old messages of the conversation once
+		//print all of the old messages of the conversation just once
 		for(Message msg : conversation.getMessages()) {
 			System.out.println(msg.prettyToString());
 		}
 
 		//start the conversation loop
-		while(controller.isInConversation()) {
+		while(session.isInConversation()) {
 			String command = scanner.nextLine();
-			this.controller.conversationCommand(command);
+			this.session.conversationCommand(command);
 		}	
 	}
 
@@ -128,20 +158,19 @@ public class Shell implements SessionListener{
 	}
 
 
-	/**
-	 * Prompts the user to enter some text and returns it to the controller.
-	 */
-	@Override
-	public String userPrompt(String message) {
-		System.out.println(message);
-		String response  = scanner.nextLine();
-		return response ;
-	}
-
+	
 
 	@Override
 	public void userMessage(String message) {
 		System.out.println(message);
+	}
+
+
+	@Override
+	public String waitForUserResponse(String message) {
+		System.out.println(message);
+		String response = scanner.nextLine();
+		return response;
 	}
 
 
