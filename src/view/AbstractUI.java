@@ -1,6 +1,10 @@
-package controller;
+package view;
 
 import java.util.ArrayList;
+
+import controller.Session;
+import controller.SessionListener;
+import controller.UserPrompt;
 
 public abstract class AbstractUI implements SessionListener {
 
@@ -17,14 +21,6 @@ public abstract class AbstractUI implements SessionListener {
 	}
 	
 	
-	
-	@Override
-	public void mainLoop() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
 
 	@Override
 	public void displayPrompt(UserPrompt userPrompt) {
@@ -47,6 +43,8 @@ public abstract class AbstractUI implements SessionListener {
 	}
 	
 	
+	
+	//refactor this class to make it event-driven instead of "pause-and-wait".
 	
 	
 	
