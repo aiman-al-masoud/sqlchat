@@ -81,7 +81,7 @@ public class Shell extends AbstractUI{
 		while(true) {
 			String commandText = scanner.nextLine();
 			Command command  = parseCommand(commandText);
-			session.runCommand(command.serviceCode, command.args);
+			session.runCommand(command);
 		}
 	}
 

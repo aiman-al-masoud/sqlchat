@@ -26,7 +26,7 @@ public class Main {
 		if(!startCommand.trim().isEmpty()) {
 			
 			Command command = Shell.parseCommand(startCommand);
-			session.runCommand(command.serviceCode, command.args);
+			session.runCommand(command);
 			System.exit(0);
 		}
 		

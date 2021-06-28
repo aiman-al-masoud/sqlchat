@@ -73,7 +73,7 @@ public class Session implements UserListener{
 
 		//if no user is currently saved, ask for a userId		
 		if(localUser==null) {
-			attemptLogin();
+			chooseUser();
 		}
 
 		//ask the user for their password 
@@ -88,8 +88,11 @@ public class Session implements UserListener{
 
 
 
-	public void runCommand(SessionServices serviceCode, String[] args) {
+	public void runCommand(Command command) {
 
+		SessionServices serviceCode = command.serviceCode;
+		String[] args = command.args;
+		
 		switch(serviceCode) {
 		case CHKEY:
 			//changes the public key
@@ -114,9 +117,6 @@ public class Session implements UserListener{
 			//display some help
 			userInterface.displayHelp();
 			break;
-		case LOGIN:
-			askForPassword();			
-			break;
 		case LOGOUT:
 			//log the current user out
 			localUser.logout();
@@ -135,9 +135,9 @@ public class Session implements UserListener{
 			}
 			break;
 		case OPEN:
+		
 			//open a conversation
 			if(localUser.isLoggedIn()) {
-
 				Conversation conversation = ConversationManager.getInstance().getConversation(args[0].trim());
 				localUser.enterConversation(conversation);	
 			}
@@ -184,13 +184,12 @@ public class Session implements UserListener{
 	/**
 	 * This procedure indirectly calls the UI to get the username.
 	 */
-	public void attemptLogin() {
+	public void chooseUser() {
 
 
-		UserPrompt userPrompt = new UserPrompt(SessionServices.LOGIN);
+		UserPrompt userPrompt = new UserPrompt(SessionServices.CHUSER);
 
 		userPrompt.addPrompt("Enter your user id:");
-		userPrompt.addPrompt("Enter your user password:");
 
 		userInterface.displayPrompt(userPrompt);
 	}
@@ -278,26 +277,23 @@ public class Session implements UserListener{
 			userInterface.userMessage("Deleted: "+success);
 
 			break;
-		case LOGIN:
+		case CHUSER:
+			
 
 			String userId = userInput[0].trim();
-			String passwordAttempt = userInput[0];
+			//String passwordAttempt = userInput[1];
 			User user = new User(userId);
 
 			//check if user exists on server
 			if(!user.exists()) {
 				userInterface.userMessage("user does not exist!");
+				this.chooseUser();
 				return;
 			}
-
-			//check password 
-			success = user.logIn(passwordAttempt);
-			if(success) {
-				UserManager.getInstance().saveLocalUser(user);
-				userInterface.welcomeUser(userId);
-			}else {
-				userInterface.userMessage("wrong password!");
-			}
+			
+			this.localUser = user;
+			localUser.addListener(this);
+			UserManager.getInstance().saveLocalUser(user);
 
 			break;
 		case SIGNUP:
@@ -306,7 +302,12 @@ public class Session implements UserListener{
 			userInterface.userMessage("account created successfully!");
 			break;
 		case AUTHENTICATE:
+			
+			
+			
+			
 			success = localUser.logIn(userInput[0]);
+			
 			if(!success) {
 				askForPassword();
 			}
