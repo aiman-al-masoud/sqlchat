@@ -26,7 +26,7 @@ END: ends a conversation. (only when inside of a conversation).
 
 CHKEY: changes the key-pair associated to the current account, and overwrites the old encrypter object.
 
-LS-U: lists all of the registered accounts on the server.
+LSU: lists all of the registered accounts on the server.
 
 CLS: clears the screen.
 

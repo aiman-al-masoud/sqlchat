@@ -2,7 +2,7 @@ package model.conversations;
 
 import java.util.Date;
 
-import model.user.UserManager;
+import model.user.LocalUser;
 
 public class Message {
 
@@ -54,7 +54,7 @@ public class Message {
 		String prettyMessage = getTimeSent()+" ";
 		
 		
-		if(senderId.equals(UserManager.getInstance().getLocalUser().getId())) {
+		if(senderId.equals(LocalUser.getInstance().getLocalUser().getId())) {
 			prettyMessage+="[you]: ";
 		}else {
 			prettyMessage+="["+senderId+"]: ";

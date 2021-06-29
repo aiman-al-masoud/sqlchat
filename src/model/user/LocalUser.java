@@ -5,16 +5,22 @@ import java.io.IOException;
 
 import io.FileIO;
 
-public class UserManager {
+/**
+ * This is a singleton class for the purpose of managing user persistence. 
+ * @author aiman
+ *
+ */
+
+public class LocalUser {
 
 	private User localUser;
-	private static UserManager instance;
+	private static LocalUser instance;
 	private static File localUserFile = new File("res"+File.separator+"settings"+File.separator+"localUser");
 
-	public static UserManager getInstance() {
+	public static LocalUser getInstance() {
 
 		if(instance==null) {
-			instance = new UserManager();
+			instance = new LocalUser();
 		}
 
 		return instance;
@@ -27,7 +33,7 @@ public class UserManager {
 
 
 
-	private UserManager() {
+	private LocalUser() {
 		loadLocalUser();
 	}
 

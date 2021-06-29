@@ -10,7 +10,7 @@ import io.FileIO;
 import model.encryption.EncrypterBuilder;
 import model.encryption.EncrypterIF;
 import model.user.User;
-import model.user.UserManager;
+import model.user.LocalUser;
 
 /**
  * The id of a conversation is the cocatenation of the names
@@ -156,7 +156,7 @@ public class Conversation extends File{
 	 */
 	public void sendMessage(String message) {
 		EncrypterIF encr = EncrypterBuilder.getInstance().getDefaultEncrypter();
-		User sender = UserManager.getInstance().getLocalUser();
+		User sender = LocalUser.getInstance().getLocalUser();
 		
 		this.appendMessage(new Message(System.currentTimeMillis(), sender.getId(), message));
 		

@@ -10,7 +10,7 @@ import model.conversations.ConversationManager;
 import model.conversations.Message;
 import model.user.User;
 import model.user.UserListener;
-import model.user.UserManager;
+import model.user.LocalUser;
 
 
 /**
@@ -59,8 +59,8 @@ public class Session implements UserListener{
 		//if necessary
 		createSettingsDir();
 
-		//get the current user 
-		localUser = UserManager.getInstance().getLocalUser();
+		//get the currently saved user 
+		localUser = LocalUser.getInstance().getLocalUser();
 
 		//add this Session to the User's listeners 
 		if(localUser!=null) {
@@ -88,10 +88,19 @@ public class Session implements UserListener{
 
 
 
+	/**
+	 * Accepts a Command and executes it
+	 * @param command
+	 */
 	public void runCommand(Command command) {
 
+		
+		//get the command's code
 		SessionServices serviceCode = command.serviceCode;
+		
+		//get the inserted arguments
 		String[] args = command.args;
+		
 		
 		switch(serviceCode) {
 		case CHKEY:
@@ -118,8 +127,10 @@ public class Session implements UserListener{
 			userInterface.displayHelp();
 			break;
 		case LOGOUT:
-			//log the current user out
-			localUser.logout();
+			//log the current user out			
+			if(localUser!=null) {
+				localUser.logout();
+			}
 			break;
 		case LS:
 			//list the conversations
@@ -129,10 +140,8 @@ public class Session implements UserListener{
 			break;
 		case LSU:
 			//lists all of the registered accounts on this server
-			this.userInterface.userMessage("ALL OF THE ACCOUNTS ON THIS SERVER:");
-			for(String user : UserDAO.selectAll()) {
-				userInterface.userMessage(user);
-			}
+			ArrayList<String> allRegisteredUsers = UserDAO.selectAll();
+			userInterface.displayRegisteredUsers(allRegisteredUsers);
 			break;
 		case OPEN:
 		
@@ -293,7 +302,7 @@ public class Session implements UserListener{
 			
 			this.localUser = user;
 			localUser.addListener(this);
-			UserManager.getInstance().saveLocalUser(user);
+			LocalUser.getInstance().saveLocalUser(user);
 
 			break;
 		case SIGNUP:
@@ -302,9 +311,6 @@ public class Session implements UserListener{
 			userInterface.userMessage("account created successfully!");
 			break;
 		case AUTHENTICATE:
-			
-			
-			
 			
 			success = localUser.logIn(userInput[0]);
 			
@@ -355,7 +361,7 @@ public class Session implements UserListener{
 
 	@Override
 	public void onLoggingOut() {
-		UserManager.getInstance().deleteLocalUser();
+		LocalUser.getInstance().deleteLocalUser();
 	}
 
 	@Override

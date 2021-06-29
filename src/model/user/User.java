@@ -100,24 +100,14 @@ public class User {
 
 	public boolean logIn(String passwordAttempt) {
 
-		//build the default encrypter.
+		//get the default encrypter.
 		encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
 
-		//hash the password attempt, to comapre it to the hashed password on the server
+		//hash the password attempt, to compare it to the hashed password on the server
 		String encryptedPasswordAttempt = hasher.encrypt(passwordAttempt);
 
-		//authenticate this user
-		if(UserDAO.authenticate(this, encryptedPasswordAttempt)) {
-
-			//if login was successful, set the login variable to true.
-			loggedIn = true;
-
-			//return success
-			return true;
-		}
-
-		//login operation unsuccessful
-		return false;
+		//authenticate this user and set the loggedIn flag
+		return loggedIn = UserDAO.authenticate(this, encryptedPasswordAttempt);
 	}
 
 
@@ -125,14 +115,16 @@ public class User {
 	 * logout disables all of the connectivity-related features of this object
 	 */
 	public void logout() {
+		
+		//set loggedIn back to false
 		loggedIn = false;
 
+		//stop polling the server for new messages
 		this.stopPullingMessages();
 
 		//notify listeners
 		for(UserListener listener : listeners) {
 			listener.onLoggingOut();
-			UserManager.getInstance().deleteLocalUser();
 		}
 	}
 
@@ -158,6 +150,7 @@ public class User {
 				listener.onMessages(messages);
 			}
 
+			//send the message over to the server
 			this.currentConversation.sendMessage(message);
 
 		}
@@ -193,6 +186,8 @@ public class User {
 		}
 
 	}
+	
+	
 
 	/**
 	 * Tell the server to store a new user.
@@ -347,7 +342,10 @@ public class User {
 	 * Stops pulling messages 
 	 */
 	public void stopPullingMessages() {
-		pullTaskTimer.cancel();
+		if(pullTaskTimer!=null ) {
+			pullTaskTimer.cancel();
+
+		}
 	}
 
 

@@ -173,6 +173,16 @@ public class Shell extends AbstractUI{
 	}
 
 
+
+	@Override
+	public void displayRegisteredUsers(ArrayList<String> allRegisteredUsers) {
+		userMessage("ALL OF THE ACCOUNTS ON THIS SERVER:");
+		for(String userId : allRegisteredUsers) {
+			userMessage(userId);
+		}
+	}
+
+
 	
 
 
