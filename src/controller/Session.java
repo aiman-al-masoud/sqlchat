@@ -194,13 +194,10 @@ public class Session implements UserListener{
 	 * This procedure indirectly calls the UI to get the username.
 	 */
 	public void chooseUser() {
-
-
+		
 		UserPrompt userPrompt = new UserPrompt(SessionServices.CHUSER);
-
 		userPrompt.addPrompt("Enter your user id:");
-
-		userInterface.displayPrompt(userPrompt);
+		userInterface.startPrompt(userPrompt);
 	}
 
 
@@ -210,7 +207,7 @@ public class Session implements UserListener{
 	public void askForPassword() {
 		UserPrompt userPrompt = new UserPrompt(SessionServices.AUTHENTICATE);
 		userPrompt.addPrompt("Enter your password:");
-		userInterface.displayPrompt(userPrompt);
+		userInterface.startPrompt(userPrompt);
 	}
 
 
@@ -231,7 +228,7 @@ public class Session implements UserListener{
 		userPrompt.addPrompt("Enter the schema:");
 
 		//call the interface to display it
-		userInterface.displayPrompt(userPrompt);
+		userInterface.startPrompt(userPrompt);
 
 	}
 
@@ -247,7 +244,7 @@ public class Session implements UserListener{
 		userPrompt.addPrompt("choose a new password:");
 
 		//call the UI to display the userprompt
-		userInterface.displayPrompt(userPrompt);		
+		userInterface.startPrompt(userPrompt);		
 	}
 
 
@@ -312,6 +309,7 @@ public class Session implements UserListener{
 			break;
 		case AUTHENTICATE:
 			
+					
 			success = localUser.logIn(userInput[0]);
 			
 			if(!success) {
@@ -340,7 +338,7 @@ public class Session implements UserListener{
 		UserPrompt userPrompt = new UserPrompt(SessionServices.DELACC);
 		userPrompt.addPrompt("Are you sure you want to delete this account? (y/n)");
 		userPrompt.addPrompt("Confirm your password:");
-		userInterface.displayPrompt(userPrompt);
+		userInterface.startPrompt(userPrompt);
 	}
 
 

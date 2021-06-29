@@ -18,11 +18,9 @@ public interface SessionListener{
 	public void conversationLoop(Conversation conversation);
 	public void welcomeUser(String userId);
 	public void displayRegisteredUsers(ArrayList<String> allRegisteredUsers);
-	
-	
-	public void displayPrompt(UserPrompt userPrompt);
-	public String waitForUserResponse(String message);
 	public void userMessage(String message);
-
+	
+	
+	public void startPrompt(UserPrompt userPrompt);
 
 }

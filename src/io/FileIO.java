@@ -69,19 +69,6 @@ public class FileIO {
 		}
 		
 	}
-	
-	
-	
-	
-	
-	
-	public static void main(String[] args) {
-		//write("res/notes/text.txt", "crap");
-		//System.out.println(read("res/notes/text.txt"));
 		
-	}
-	
-	
-	
 	
 }

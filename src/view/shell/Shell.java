@@ -1,4 +1,4 @@
-package view;
+package view.shell;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +10,7 @@ import controller.SessionServices;
 import io.FileIO;
 import model.conversations.Conversation;
 import model.conversations.Message;
+import view.abstrct.AbstractUI;
 
 /**
  * Shell is a user-interface class that makes a set of 
@@ -36,6 +37,9 @@ public class Shell extends AbstractUI{
 		
 		//get a new stdin scanner
 		scanner = new Scanner(System.in);
+		
+		//set the input component
+		this.setInputComponent(new ShellInput(this));
 	}
 
 	
@@ -156,22 +160,10 @@ public class Shell extends AbstractUI{
 		}
 	}
 
-
-	
-
 	@Override
 	public void userMessage(String message) {
 		System.out.println(message);
 	}
-
-
-	@Override
-	public String waitForUserResponse(String message) {
-		System.out.println(message);
-		String response = scanner.nextLine();
-		return response;
-	}
-
 
 
 	@Override

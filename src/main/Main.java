@@ -3,7 +3,7 @@ package main;
 
 import controller.Command;
 import controller.Session;
-import view.Shell;
+import view.shell.Shell;
 
 public class Main {
 

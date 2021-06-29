@@ -25,6 +25,23 @@ public class UserPrompt {
 	
 	
 	
+	/**
+	 * Gets the next prompt in the queue and removes it
+	 * @return
+	 */
+	public String nextPrompt() {
+		
+		if(prompts.size()<=0) {
+			return null;
+		}
+		
+		String buffer = prompts.get(0);
+		prompts.remove(0);
+		return buffer;
+	}
+	
+	
+	
 	
 	
 	
