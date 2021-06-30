@@ -15,12 +15,13 @@ public interface SessionListener{
 	public void exitConversation(ArrayList<Conversation> conversations);
 	public void printMessages(ArrayList<Message> messages);
 	public void mainLoop();
-	public void conversationLoop(Conversation conversation);
 	public void welcomeUser(String userId);
 	public void displayRegisteredUsers(ArrayList<String> allRegisteredUsers);
 	public void userMessage(String message);
-	
-	
 	public void startPrompt(UserPrompt userPrompt);
+	public void goHome();	
+	public void displayConversation(Conversation conversation);
+	
+	
 
 }

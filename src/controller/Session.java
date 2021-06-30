@@ -94,29 +94,43 @@ public class Session implements UserListener{
 	 */
 	public void runCommand(Command command) {
 
-		
 		//get the command's code
 		SessionServices serviceCode = command.serviceCode;
-		
+
 		//get the inserted arguments
 		String[] args = command.args;
+
+
+		//commands for the user when not logged in:
+		if(!localUser.isLoggedIn()) {
+			this.loggedOutCommand(serviceCode, args);
+			return;
+		}
+
 		
+		//commands for the user when logged in and NOT in a conversation:
+		if(localUser.isLoggedIn() && !localUser.isInConversation()) {
+			this.loggedInCommand(serviceCode, args);
+			return;
+		}
+		
+		//commands when inside a conversation
+		if(localUser.isInConversation()) {
+			this.inConversationCommand(serviceCode, args);
+			return;
+		}
+		
+	}
+	
+	
+	
+	private void commonCommand(SessionServices serviceCode, String[] args) {
 		
 		switch(serviceCode) {
-		case CHKEY:
-			//changes the public key
-			localUser.changeEncrypter();
-			userInterface.userMessage("NEW PUBLIC KEY: "+localUser.getPublicKey());
-			break;
+		
 		case CLS:
 			//clears the screen
-			userInterface.userMessage("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-			break;
-		case CONFIG:
-			setConnectionParametersProcedure();
-			break;
-		case DELACC:
-			confirmDeleteAccount();
+			userInterface.goHome();
 			break;
 		case EXIT:
 			//terminate the program with no error code.
@@ -126,10 +140,48 @@ public class Session implements UserListener{
 			//display some help
 			userInterface.displayHelp();
 			break;
-		case LOGOUT:
-			//log the current user out			
-			if(localUser!=null) {
-				localUser.logout();
+		case LSU:
+			//lists all of the registered accounts on this server
+			ArrayList<String> allRegisteredUsers = UserDAO.selectAll();
+			userInterface.displayRegisteredUsers(allRegisteredUsers);
+			break;
+		case CONFIG:
+			setConnectionParametersProcedure();
+			break;
+		default:
+		case NOTACMD:
+			String wrongCommand = args.length==0 ? "" :args[0]; 
+			userInterface.userMessage("'"+wrongCommand+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");
+			break;
+		}
+		
+	}
+	
+	
+	private void loggedOutCommand(SessionServices serviceCode, String[] args) {
+		
+		switch(serviceCode) {
+		case SIGNUP:
+			createNewUserProcedure();
+			break;
+		default:
+			commonCommand(serviceCode, args);
+			break;
+		}
+	}
+	
+	private void loggedInCommand(SessionServices serviceCode, String[] args) {
+		
+		switch(serviceCode) {
+		case RM:
+			//deletes a conversation
+			ConversationManager.getInstance().removeConversation(args[0].trim());
+			break;
+		case OPEN:
+			//open a conversation
+			if(localUser.isLoggedIn()) {
+				Conversation conversation = ConversationManager.getInstance().getConversation(args[0].trim());
+				localUser.enterConversation(conversation);	
 			}
 			break;
 		case LS:
@@ -138,63 +190,52 @@ public class Session implements UserListener{
 				userInterface.listConversations(ConversationManager.getInstance().getConversations());
 			}
 			break;
-		case LSU:
-			//lists all of the registered accounts on this server
-			ArrayList<String> allRegisteredUsers = UserDAO.selectAll();
-			userInterface.displayRegisteredUsers(allRegisteredUsers);
+		case LOGOUT:
+			//log the current user out			
+			if(localUser!=null) {
+				localUser.logout();
+			}	
 			break;
-		case OPEN:
-		
-			//open a conversation
-			if(localUser.isLoggedIn()) {
-				Conversation conversation = ConversationManager.getInstance().getConversation(args[0].trim());
-				localUser.enterConversation(conversation);	
-			}
-			break;
-		case RM:
-			//deletes a conversation
-			ConversationManager.getInstance().removeConversation(args[0].trim());
-			break;
-		case SIGNUP:
-			createNewUserProcedure();
+		case CHKEY:
+			//changes the public key
+			localUser.changeEncrypter();
+			userInterface.userMessage("NEW PUBLIC KEY: "+localUser.getPublicKey());
+			break;	
+		case DELACC:
+			confirmDeleteAccount();
 			break;
 		default:
-		case NOTACMD:
-			userInterface.userMessage("'"+args[0]+"' not recognized as a command!\n Please enter 'help' for a list of valid commands.");
+			commonCommand(serviceCode, args);
 			break;
+		}
+	}
+	
+	
+	
+	private void inConversationCommand(SessionServices serviceCode, String[] args) {
+		
+		switch(serviceCode) {
+		
+		case END:
+			//end conversation
+			localUser.exitConversation();
+			break;
+		default:
 		case SENDMSG:
 			localUser.sendMessage(args[0]);
 			break;
-			
-			
-		}	
-	}
-
-
-
-	public void conversationCommand(String command) {
-
-		//if command is "end", end the conversation
-		if(command.toUpperCase().trim().equals("END")) {
-			localUser.exitConversation();
-			return;
+	
 		}
-
-		//else, send a message
-		localUser.sendMessage(command);
+		
 	}
-
-
-	public boolean isInConversation() {
-		return localUser.isInConversation();
-	}
+	
 
 
 	/**
 	 * This procedure indirectly calls the UI to get the username.
 	 */
 	public void chooseUser() {
-		
+
 		UserPrompt userPrompt = new UserPrompt(SessionServices.CHUSER);
 		userPrompt.addPrompt("Enter your user id:");
 		userInterface.startPrompt(userPrompt);
@@ -284,7 +325,7 @@ public class Session implements UserListener{
 
 			break;
 		case CHUSER:
-			
+
 
 			String userId = userInput[0].trim();
 			//String passwordAttempt = userInput[1];
@@ -296,7 +337,7 @@ public class Session implements UserListener{
 				this.chooseUser();
 				return;
 			}
-			
+
 			this.localUser = user;
 			localUser.addListener(this);
 			LocalUser.getInstance().saveLocalUser(user);
@@ -308,10 +349,10 @@ public class Session implements UserListener{
 			userInterface.userMessage("account created successfully!");
 			break;
 		case AUTHENTICATE:
-			
-					
+
+
 			success = localUser.logIn(userInput[0]);
-			
+
 			if(!success) {
 				askForPassword();
 			}
@@ -324,8 +365,6 @@ public class Session implements UserListener{
 		}
 
 	}
-
-
 
 
 	public void confirmDeleteAccount() {
@@ -343,13 +382,11 @@ public class Session implements UserListener{
 
 
 
-
-	
-
 	//USER LISTENER METHODS------------------
 	@Override
 	public void onEnteredConversation(Conversation conversation) {
-		userInterface.conversationLoop(conversation);
+		//userInterface.conversationLoop(conversation);
+		userInterface.displayConversation(conversation);
 	}
 
 	@Override
@@ -372,8 +409,8 @@ public class Session implements UserListener{
 		userInterface.printMessages(messages);
 	}
 
-	///////////////////
-	
+	///////////////////////////////////////////////////////
+
 
 
 	/**
@@ -388,7 +425,7 @@ public class Session implements UserListener{
 	}
 
 
-	
-	
+
+
 
 }

@@ -4,6 +4,8 @@ package main;
 import controller.Command;
 import controller.Session;
 import view.shell.Shell;
+import view.shell.Parser;
+
 
 public class Main {
 
@@ -25,7 +27,7 @@ public class Main {
 		//in case the command is not empty, execute it and then terminate the program 
 		if(!startCommand.trim().isEmpty()) {
 			
-			Command command = Shell.parseCommand(startCommand);
+			Command command = Parser.parseCommand(startCommand);
 			session.runCommand(command);
 			System.exit(0);
 		}

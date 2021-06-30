@@ -20,6 +20,8 @@ public class ShellInput implements InputUI {
 	@Override
 	public void showPrompt(String text) {
 		System.out.println(text);
+		
+		//here you don't need a callback, you can pause and wait, but not in android GUI implementations
 		String response = scanner.nextLine();
 		abstractUI.onResponse(response);
 	}

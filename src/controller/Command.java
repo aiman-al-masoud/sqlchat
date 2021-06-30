@@ -11,5 +11,15 @@ public class Command {
 	}
 	
 	
+	public String toString() {
+		
+		String concat = "";
+		for(String arg : args) {
+			concat+=arg+" ";
+		}
+		
+		return "["+serviceCode.toString()+", "+concat+"]";
+	}
+	
 	
 }

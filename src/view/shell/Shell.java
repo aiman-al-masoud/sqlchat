@@ -30,51 +30,18 @@ public class Shell extends AbstractUI{
 	 */
 	Scanner scanner;
 
-	
-	
+
+
 	public Shell(Session controller) {
 		super(controller);
-		
+
 		//get a new stdin scanner
 		scanner = new Scanner(System.in);
-		
+
 		//set the input component
 		this.setInputComponent(new ShellInput(this));
 	}
 
-	
-	
-	public static Command parseCommand(String commandText) {
-		
-		
-		String[] commandParts = commandText.split("\\s+");
-		String commandName = commandParts[0].toUpperCase();
-		
-		SessionServices commandCode;
-		try {
-			commandCode = SessionServices.valueOf(commandName);
-		}catch(IllegalArgumentException e) {
-			commandCode = SessionServices.NOTACMD;
-			String[] args = {commandParts[0]};
-			return new Command(commandCode, args);
-		}
-		
-		
-		String[] args;
-		if(commandParts.length == 1) {
-			args = new String[0];
-		}else {
-			args = Arrays.copyOfRange(commandParts, 1, commandParts.length);
-		}
-		
-	
-		
-		return new Command(commandCode, args);
-	}
-	
-	
-	
-	
 
 	/**
 	 * Wait for user input, then pass the arguments to the controller.
@@ -83,7 +50,7 @@ public class Shell extends AbstractUI{
 	public void mainLoop() {
 		while(true) {
 			String commandText = scanner.nextLine();
-			Command command  = parseCommand(commandText);
+			Command command  = Parser.parseCommand(commandText);
 			session.runCommand(command);
 		}
 	}
@@ -101,23 +68,6 @@ public class Shell extends AbstractUI{
 	}
 
 
-	/**
-	 * Displays messages from a conversation and starts listening to user input of messages to that conversation.
-	 * @param conversation
-	 */
-	@Override
-	public void conversationLoop(Conversation conversation) {
-		//print all of the old messages of the conversation just once
-		for(Message msg : conversation.getMessages()) {
-			System.out.println(msg.prettyToString());
-		}
-
-		//start the conversation loop
-		while(session.isInConversation()) {
-			String command = scanner.nextLine();
-			this.session.conversationCommand(command);
-		}	
-	}
 
 
 	/**
@@ -125,9 +75,7 @@ public class Shell extends AbstractUI{
 	 */
 	@Override
 	public void exitConversation(ArrayList<Conversation> conversations) {
-		for(int i=0; i<100;i++) {
-			System.out.println("");
-		}
+		this.goHome();
 		listConversations(conversations);
 		System.out.println();
 	}
@@ -175,7 +123,21 @@ public class Shell extends AbstractUI{
 	}
 
 
-	
+
+	@Override
+	public void goHome() {
+		userMessage("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+	}
+
+
+	@Override
+	public void displayConversation(Conversation conversation) {
+		//print all of the old messages of the conversation just once
+		this.printMessages(conversation.getMessages());
+	}
+
+
+
 
 
 
