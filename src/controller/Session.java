@@ -148,6 +148,12 @@ public class Session implements UserListener{
 		case CONFIG:
 			setConnectionParametersProcedure();
 			break;
+		case LOGOUT:
+			//log the current user out			
+			if(localUser!=null) {
+				localUser.logout();
+			}	
+			break;	
 		default:
 		case NOTACMD:
 			String wrongCommand = args.length==0 ? "" :args[0]; 
@@ -190,12 +196,6 @@ public class Session implements UserListener{
 				userInterface.listConversations(ConversationManager.getInstance().getConversations());
 			}
 			break;
-		case LOGOUT:
-			//log the current user out			
-			if(localUser!=null) {
-				localUser.logout();
-			}	
-			break;
 		case CHKEY:
 			//changes the public key
 			localUser.changeEncrypter();
@@ -222,7 +222,11 @@ public class Session implements UserListener{
 			break;
 		default:
 		case SENDMSG:
-			localUser.sendMessage(args[0]);
+			String message = "";
+			for(String word : args) {
+				message+=word+" ";
+			}
+			localUser.sendMessage(message);
 			break;
 	
 		}
@@ -385,7 +389,6 @@ public class Session implements UserListener{
 	//USER LISTENER METHODS------------------
 	@Override
 	public void onEnteredConversation(Conversation conversation) {
-		//userInterface.conversationLoop(conversation);
 		userInterface.displayConversation(conversation);
 	}
 
@@ -401,7 +404,7 @@ public class Session implements UserListener{
 
 	@Override
 	public void onLoggingIn() {
-		// TODO Auto-generated method stub
+		//
 	}
 
 	@Override

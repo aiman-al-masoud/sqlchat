@@ -317,15 +317,12 @@ public class User {
 	 */
 	public void startPullingMessages() {
 
-		//reference to this User.
-		User myself = this;
-
 		//make a new timertask that pulls messages for this User.
 		TimerTask task = new TimerTask() {
 
 			@Override
 			public void run() {
-				myself.pullMessages();
+				pullMessages();
 			}
 
 		};

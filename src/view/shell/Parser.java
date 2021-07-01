@@ -22,12 +22,15 @@ public class Parser {
 		String commandName = commandParts[0].toUpperCase();
 
 		SessionServices commandCode;
+
+	
+		
+		
 		try {
 			commandCode = SessionServices.valueOf(commandName);
 		}catch(IllegalArgumentException e) {
 			commandCode = SessionServices.NOTACMD;
-			String[] args = {commandParts[0]};
-			return new Command(commandCode, args);
+			return new Command(commandCode, commandParts);
 		}
 
 
