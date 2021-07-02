@@ -24,11 +24,8 @@ public class MessageDAO {
 	 * @param sender
 	 * @param message
 	 */
-	public static void messageUser(String recipient, User sender, String message) {
+	public static void messageUser(String recipient, String senderId, String message) {
 
-		
-
-		String senderId = sender.getId();
 		long unixTime = System.currentTimeMillis(); 
 		String recipientId = recipient;
 
@@ -65,7 +62,7 @@ public class MessageDAO {
 	 * @return
 	 */
 	public static ArrayList<Message> pullMessages(User recipient) {
-	
+
 
 		ArrayList<Message> result = new ArrayList<Message>();
 
@@ -79,11 +76,11 @@ public class MessageDAO {
 			Statement statement = connection.createStatement();
 
 			ResultSet resultSet = statement.executeQuery(MessageFormat.format(sql, recipientId)); 
-			
+
 			while(resultSet.next()) {
 				//one record for each iteration of the loop
 				//starts counting from 1 onwards!!
-				result.add(new Message(Long.parseLong(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(3) ));
+				result.add(new Message(Long.parseLong(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(3), recipient.getId()));
 			}
 
 			//delete all messages from the mail-box table
@@ -95,8 +92,8 @@ public class MessageDAO {
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
-		
-		
+
+
 		return result;
 	}
 

@@ -6,8 +6,8 @@ import model.conversations.Conversation;
 import model.conversations.Message;
 
 /**
- * This interface is meant to be implemented by UI
- * classes that have to display up-to-date info about the User.
+ * This interface is meant to be implemented by 
+ * classes that need to have access to up-to-date info about the User.
  */
 public interface UserListener{
 	public void onEnteredConversation(Conversation conversation);

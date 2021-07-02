@@ -4,18 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import daos.MessageDAO;
-import daos.UserDAO;
+
 import io.FileIO;
-import model.encryption.EncrypterBuilder;
-import model.encryption.EncrypterIF;
 import model.user.User;
 import model.user.LocalUser;
 
 /**
- * The id of a conversation is the cocatenation of the names
- * of the participants with a separator 
- * 
+ * A Conversation is a collection of messages exchanged with the same correspondent.
  *
  */
 
@@ -24,67 +19,59 @@ public class Conversation extends File{
 
 	public static File conversationsDir = new File("res"+File.separator+"conversations");
 	private ArrayList<Message> messages;
+
+	String counterpart;
+
+
+	ConversationListener conversationListener;
 	
-	private ArrayList<String> participants;
-	static char SEPARATOR = '+'; 
 	
 	
 	public Conversation(String id) {
-		
+
 		//get this conversation from the relative directory
 		super(conversationsDir.getPath()+File.separator+id);
-		
-		//initialize the participants list
-		participants = new ArrayList<String>();
 
-		
-		try {
+		//the id of the correspondent/counterpart
+		counterpart = id;
 
-			//split the id by the SEPARATOR to get each of participants' id
-			for(String participant : id.split("\\"+SEPARATOR+"")) { //unfortunately, this SEPATATOR needs to be escaped
-				participants.add(participant);
-			}
-		}catch(Exception e ) {
-			//in case there's just one participant
-			participants.add(id);
-		}
-			
 		//make a new list of messages
 		messages = new ArrayList<Message>();
-		
+
 		//if this conversation file doesn't exist on disk yet, create it
 		if(!exists()) {
 			create();
 		}
-		
+
 		//load the old messages from the file.
 		loadMessages();
+		
+		
+		//add the local user as a listener to this conversation.
+		conversationListener = LocalUser.getInstance().getLocalUser();
 	}
 
-	
-	
-	/**
-	 * Adds a new participant to this conversation, and changes the name of its file on disk
-	 * @param participant
-	 */
-	public void addParticipant(String participant) {
-		this.participants.add(participant);
-		this.renameTo(new File(conversationsDir.getPath()+File.separator+getId()));
-	}
-	
 
-	
+
 	/**
 	 * Appends a single message to this Conversation
+	 * @param message
 	 */
 	public void appendMessage(Message message) {
 		messages.add(message);
-		FileIO.append(conversationsDir.getPath()+File.separator+getId(), message.toString()+"\n");
+		FileIO.append(conversationsDir.getPath()+File.separator+counterpart, message.toString()+"\n");
+		
+		
+		//notify this conversation's listeners
+		ArrayList<Message> msgs = new ArrayList<Message>();
+		msgs.add(message);
+		conversationListener.onMessages(msgs);
 	}
+
 	
-	
+
 	/**
-	 * Append new messages to the list, as well as the file on disk.
+	 * Append new messages to this Conversation
 	 * @param messages
 	 */
 	public void appendMessages(ArrayList<Message> messages) {
@@ -100,7 +87,7 @@ public class Conversation extends File{
 	private void loadMessages() {
 		Message message = null;
 		for(String messageString : FileIO.read(getPath()).split("\n") ) {
-			if((message = Message.buildMessage(messageString))!=null) {
+			if((message = Message.loadMessage(messageString))!=null) {
 				messages.add(message);
 			}
 		}
@@ -127,55 +114,36 @@ public class Conversation extends File{
 		}
 	}
 
-	
-	/**
-	 * The id is a concatenation of the names of the participants separated by the SEPARATOR.
-	 * @return
-	 */
-	public String getId() {
-		String id = "";
-		for(String participant : participants) {
-			id+=participant+SEPARATOR;
-		}
-		return id.charAt(id.length()-1)==SEPARATOR? id.substring(0, id.length()-1) : id;
-	}
-
-
 
 	@Override
 	public String toString() {
-		return getId();
+		return counterpart;
 	}
 
-	
 
 	/**
-	 * 'Broadcasts' the message to all of the members of the conversation.
-	 * Encrypting the message for each one of them.
+	 * Creates a message and sends it to the "counterpart".
 	 * @param message
 	 */
 	public void sendMessage(String message) {
-		EncrypterIF encr = EncrypterBuilder.getInstance().getDefaultEncrypter();
 		User sender = LocalUser.getInstance().getLocalUser();
-		
-		this.appendMessage(new Message(System.currentTimeMillis(), sender.getId(), message));
-		
-		for(String participant : participants) {
-			String publicKey = UserDAO.getPublicKey(participant);			
-			encr.setEncryptionKey(new String[] {publicKey.split("\\s+")[0].trim(),  publicKey.split("\\s+")[1].trim()});
-			String encryptedMessage =  encr.encrypt(message);
-			MessageDAO.messageUser(participant, sender, encryptedMessage);
-		}
+		Message msg = new Message(System.currentTimeMillis(), sender.getId(), message, counterpart);
+		this.appendMessage(msg);
+		msg.sendMe();
 	}
 
-	
 
 	
-	
-	
-	
-	
-	
+	public String getId() {
+		return counterpart;
+	}
+
+
+
+
+
+
+
 
 
 

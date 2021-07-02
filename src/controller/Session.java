@@ -18,7 +18,7 @@ import model.user.LocalUser;
  * listened to by the User Interface.
  * 
  * It handles the conditionals/logic, and defines the 
- * text-based commands that can be used to interact 
+ * enum-based commands that can be used to interact 
  * with the system.
  * 
  */
@@ -80,8 +80,11 @@ public class Session implements UserListener{
 		askForPassword();
 
 		//start the thread that polls the remote server for incoming messages
-		localUser.startPullingMessages();
+		//localUser.startPullingMessages();
 
+		ConversationManager.getInstance().startPullingMessages();
+		
+		
 		//start the main program loop
 		userInterface.mainLoop();
 	}
@@ -102,7 +105,7 @@ public class Session implements UserListener{
 
 
 		//commands for the user when not logged in:
-		if(!localUser.isLoggedIn()) {
+		if(localUser==null || !localUser.isLoggedIn()) {
 			this.loggedOutCommand(serviceCode, args);
 			return;
 		}
@@ -257,8 +260,6 @@ public class Session implements UserListener{
 
 
 
-
-
 	/**
 	 * This procedure indirectly uses the userinterface to get all of the parameters from the user
 	 */
@@ -399,6 +400,7 @@ public class Session implements UserListener{
 
 	@Override
 	public void onLoggingOut() {
+		ConversationManager.getInstance().stopPullingMessages();
 		LocalUser.getInstance().deleteLocalUser();
 	}
 
