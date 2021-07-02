@@ -33,6 +33,11 @@ public class ConversationManager {
 	}
 	
 	
+	/**
+	 * Get a conversation by its conversation id. Creates a new empty one if no such conversation was there.
+	 * @param conversationId
+	 * @return
+	 */
 	public Conversation getConversation(String conversationId) {
 		
 		Conversation conv = conversationsMap.get(conversationId);
@@ -45,6 +50,10 @@ public class ConversationManager {
 	
 	
 	
+	/**
+	 * Deletes a conversation by its id.
+	 * @param conversationId
+	 */
 	public void removeConversation(String conversationId) {
 		
 		try {
@@ -56,7 +65,10 @@ public class ConversationManager {
 	}
 	
 	
-	
+	/**
+	 * Get all of the saved conversations.
+	 * @return
+	 */
 	public ArrayList<Conversation> getConversations(){
 		return new ArrayList<>(conversationsMap.values());
 	}

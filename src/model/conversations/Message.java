@@ -10,6 +10,8 @@ public class Message {
 	String senderId;
 	String message;
 
+	
+	
 
 	public Message(long timeSent, String senderId, String message) {
 		this.timeSent = timeSent;
@@ -68,6 +70,7 @@ public class Message {
 		this.message = message;
 	}
 	
-
+	
+	
 
 }
