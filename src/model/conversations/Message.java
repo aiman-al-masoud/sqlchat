@@ -32,19 +32,21 @@ public class Message {
 
 
 	public static Message loadMessage(String messageString) {
-		try {
+		//try {
 			String[] parts = messageString.split(";");
 			long timeSent = Long.parseLong(parts[0].trim());
 			String senderId = parts[1].trim();
-			String message = parts.length>2? parts[2].trim() : ""; //in case of an empty message
+			//String message = parts.length>2? parts[2].trim() : ""; //in case of an empty message
 
+			String message = parts[2];
+			
 			String recipientId = parts[3].trim();
 
 			return new Message(timeSent, senderId, message, recipientId);
-		}catch(NumberFormatException e) {
+		//}catch(NumberFormatException e) {
 
-		}
-		return null;
+		//}
+		//return null;
 	}
 
 
@@ -69,6 +71,10 @@ public class Message {
 
 
 
+	/**
+	 * Used to display the message in a polished form.
+	 * @return
+	 */
 	public String prettyToString() {
 
 		String prettyMessage = getTimeSent()+" ";
@@ -83,15 +89,21 @@ public class Message {
 		return prettyMessage+message;
 	}
 
+	
 
+	
+	/*
 	public void setMessage(String message) {
 		this.message = message;
 	}
+	*/
 
 
 
 
-
+	/**
+	 * Sends this message to its "recipientId"
+	 */
 	public void sendMe() {
 		String publicKey = UserDAO.getPublicKey(recipientId);			
 		EncrypterIF encr = EncrypterBuilder.getInstance().getDefaultEncrypter();
@@ -100,6 +112,15 @@ public class Message {
 		MessageDAO.messageUser(recipientId, senderId, encryptedMessage);
 	}
 
+	
+	
+	/**
+	 * Decipher the contents of the message using the user's current local private key
+	 */
+	public void decipherForMe() {
+		this.message = EncrypterBuilder.getInstance().getDefaultEncrypter().decipher(message);
+	}
+	
 
 
 

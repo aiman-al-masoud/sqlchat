@@ -115,10 +115,12 @@ public class Conversation extends File{
 	}
 
 
+	
 	@Override
 	public String toString() {
 		return counterpart;
 	}
+	
 
 
 	/**

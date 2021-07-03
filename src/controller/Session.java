@@ -223,15 +223,16 @@ public class Session implements UserListener{
 			//end conversation
 			localUser.exitConversation();
 			break;
+		
 		default:
 		case SENDMSG:
-			String message = "";
+			String message = serviceCode==SessionServices.NOTACMD? "" : serviceCode.toString();
 			for(String word : args) {
 				message+=word+" ";
 			}
+			
 			localUser.sendMessage(message);
 			break;
-	
 		}
 		
 	}
@@ -425,7 +426,7 @@ public class Session implements UserListener{
 		//create the settings dir if it doesn't exist (thank you so much git)
 		File settings = new File("res/settings");
 		if(!settings.exists()) {
-			settings.mkdir();
+			settings.mkdirs();
 		}
 	}
 

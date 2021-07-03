@@ -7,9 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import daos.MessageDAO;
-import model.encryption.EncrypterBuilder;
 import model.user.LocalUser;
-import model.user.UserListener;
 
 
 public class ConversationManager {
@@ -99,8 +97,7 @@ public class ConversationManager {
 
 
 	/**
-	 * Pulls this user's pending messages from the server.
-	 * Only works if this user is logged in.
+	 * Pulls the users's pending messages from the server.
 	 */
 	public void pullMessages(){
 
@@ -110,8 +107,7 @@ public class ConversationManager {
 
 		//decipher the messages with the local User's private key.
 		for(Message message : incomingMessages) {
-			String plaintext = EncrypterBuilder.getInstance().getDefaultEncrypter().decipher(message.getMessage());
-			message.setMessage(plaintext);
+			message.decipherForMe();
 		}
 
 		//store the received messages in their respective conversations
