@@ -10,12 +10,16 @@ import model.conversations.ConversationManager;
 import model.conversations.Message;
 import model.user.User;
 import model.user.UserListener;
+import view.abstrct.UserPrompt;
 import model.user.LocalUser;
 
 
 /**
- * A Session listens to the current User, and is 
+ * Session listens to the current User, and is 
  * listened to by the User Interface.
+ * 
+ * Session is kind of like a facade controller that functions 
+ * as a bridge between the service and the GUI used to access it. 
  * 
  * It handles the conditionals/logic, and defines the 
  * enum-based commands that can be used to interact 

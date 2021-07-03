@@ -8,13 +8,18 @@ import model.encryption.EncrypterBuilder;
 import model.encryption.EncrypterIF;
 import model.user.LocalUser;
 
+/**
+ * A Message can either be sent or deciphered. It can also be stored
+ * away in a file as a string, and "loaded" back later when it has to be
+ * displayed to the user. 
+ * 
+ * @author aiman
+ */
 public class Message {
 
 	long timeSent; //in unix time
 	String senderId;
 	String message;
-
-
 	String recipientId;
 
 
@@ -23,81 +28,24 @@ public class Message {
 		this.timeSent = timeSent;
 		this.senderId = senderId;
 		this.message = message;
-
-
 		this.recipientId = recipientId;
 	}
 
 
-
-
-	public static Message loadMessage(String messageString) {
-		//try {
-			String[] parts = messageString.split(";");
-			long timeSent = Long.parseLong(parts[0].trim());
-			String senderId = parts[1].trim();
-			//String message = parts.length>2? parts[2].trim() : ""; //in case of an empty message
-
-			String message = parts[2];
-			
-			String recipientId = parts[3].trim();
-
-			return new Message(timeSent, senderId, message, recipientId);
-		//}catch(NumberFormatException e) {
-
-		//}
-		//return null;
-	}
-
-
-
-	public Date getTimeSent() {
-		return new Date(timeSent);
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public String getSender() {
-		return senderId;
-	}
-
-	@Override
-	public String toString() {
-		return timeSent+";"+senderId+";"+message+";"+recipientId;
-	}
-
-
-
-
 	/**
-	 * Used to display the message in a polished form.
+	 * Re-creates a message from a string that can be stored in a file.
+	 * @param messageString
 	 * @return
 	 */
-	public String prettyToString() {
+	public static Message loadMessage(String messageString) {
+		String[] parts = messageString.split(";");
+		long timeSent = Long.parseLong(parts[0].trim());
+		String senderId = parts[1].trim();
+		String message = parts[2];
+		String recipientId = parts[3].trim();
 
-		String prettyMessage = getTimeSent()+" ";
-
-
-		if(senderId.equals(LocalUser.getInstance().getLocalUser().getId())) {
-			prettyMessage+="[you]: ";
-		}else {
-			prettyMessage+="["+senderId+"]: ";
-		}
-
-		return prettyMessage+message;
+		return new Message(timeSent, senderId, message, recipientId);
 	}
-
-	
-
-	
-	/*
-	public void setMessage(String message) {
-		this.message = message;
-	}
-	*/
-
 
 
 
@@ -112,18 +60,64 @@ public class Message {
 		MessageDAO.messageUser(recipientId, senderId, encryptedMessage);
 	}
 
-	
-	
+
+
 	/**
 	 * Decipher the contents of the message using the user's current local private key
 	 */
 	public void decipherForMe() {
 		this.message = EncrypterBuilder.getInstance().getDefaultEncrypter().decipher(message);
 	}
-	
 
 
+	/**
+	 * Gets the Date this message was sent at.
+	 * @return
+	 */
+	public Date getTimeSent() {
+		return new Date(timeSent);
+	}
 
+	/**
+	 * Gets the contents of the message
+	 * @return
+	 */
+	public String getMessage() {
+		return message;
+	}
+
+	/**
+	 * Gets the sender's id.
+	 * @return
+	 */
+	public String getSender() {
+		return senderId;
+	}
+
+	/**
+	 * Converts the message to the string to be stored in a file.
+	 */
+	@Override
+	public String toString() {
+		return timeSent+";"+senderId+";"+message+";"+recipientId;
+	}
+
+
+	/**
+	 * Used to display the message in a polished form.
+	 * @return
+	 */
+	public String prettyToString() {
+
+		String prettyMessage = getTimeSent()+" ";
+
+		if(senderId.equals(LocalUser.getInstance().getLocalUser().getId())) {
+			prettyMessage+="[you]: ";
+		}else {
+			prettyMessage+="["+senderId+"]: ";
+		}
+		return prettyMessage+message;
+	}
 
 
 

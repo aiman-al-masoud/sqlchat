@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import model.conversations.Conversation;
 import model.conversations.Message;
+import view.abstrct.UserPrompt;
 
 /**
  * Has to be implemented by any User interface.

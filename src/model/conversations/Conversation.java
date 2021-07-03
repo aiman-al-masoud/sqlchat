@@ -10,7 +10,7 @@ import model.user.User;
 import model.user.LocalUser;
 
 /**
- * A Conversation is a collection of messages exchanged with the same correspondent.
+ * A Conversation is a collection of Messages exchanged with the same correspondent.
  *
  */
 
@@ -18,6 +18,7 @@ public class Conversation extends File{
 
 
 	public static File conversationsDir = new File("res"+File.separator+"conversations");
+	
 	private ArrayList<Message> messages;
 
 	String counterpart;
@@ -139,12 +140,6 @@ public class Conversation extends File{
 	public String getId() {
 		return counterpart;
 	}
-
-
-
-
-
-
 
 
 
