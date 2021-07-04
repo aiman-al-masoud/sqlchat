@@ -1,11 +1,11 @@
 package model.conversations;
 
+import java.security.PublicKey;
 import java.util.Date;
 
 import daos.MessageDAO;
 import daos.UserDAO;
-import model.encryption.EncrypterBuilder;
-import model.encryption.EncrypterIF;
+import model.encryption.Encryption;
 import model.user.LocalUser;
 
 /**
@@ -53,10 +53,9 @@ public class Message {
 	 * Sends this message to its "recipientId"
 	 */
 	public void sendMe() {
-		String publicKey = UserDAO.getPublicKey(recipientId);			
-		EncrypterIF encr = EncrypterBuilder.getInstance().getDefaultEncrypter();
-		encr.setEncryptionKey(new String[] {publicKey.split("\\s+")[0].trim(),  publicKey.split("\\s+")[1].trim()});
-		String encryptedMessage =  encr.encrypt(message);
+		String publicKeyString = UserDAO.getPublicKey(recipientId);			
+		PublicKey publicKey = Encryption.getInstance().buildPublicKey(publicKeyString.split("\\s+")[0], publicKeyString.split("\\s+")[1]);
+		String encryptedMessage =  Encryption.getInstance().cipher(publicKey, message);
 		MessageDAO.messageUser(recipientId, senderId, encryptedMessage);
 	}
 
@@ -66,7 +65,7 @@ public class Message {
 	 * Decipher the contents of the message using the user's current local private key
 	 */
 	public void decipherForMe() {
-		this.message = EncrypterBuilder.getInstance().getDefaultEncrypter().decipher(message);
+		message = Encryption.getInstance().decipher(message);
 	}
 
 

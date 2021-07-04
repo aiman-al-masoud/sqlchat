@@ -1,19 +1,12 @@
 package model.user;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Logger;
 
-import daos.MessageDAO;
 import daos.UserDAO;
 import model.conversations.Conversation;
 import model.conversations.ConversationListener;
-import model.conversations.ConversationManager;
 import model.conversations.Message;
-import model.encryption.EncrypterBuilder;
-import model.encryption.EncrypterIF;
-import sha256.SHA256;
+import model.encryption.Encryption;
 
 /**
  * 
@@ -42,19 +35,12 @@ public class User implements ConversationListener{
 	 */
 	Conversation currentConversation;
 
-	/**
-	 * the hasher is used to safely store passwords on the server. 
-	 */
-	SHA256 hasher;
-
 
 	public User(String id) {
 		//set this User's id.
 		this.id = id;
 		//create a list for this User's listeners
 		listeners = new ArrayList<UserListener>();
-		//create a SHA256 object to encrypt passwords
-		hasher = new SHA256();
 	}
 
 
@@ -84,7 +70,7 @@ public class User implements ConversationListener{
 	public boolean logIn(String passwordAttempt) {
 
 		//hash the password attempt, to compare it to the hashed password on the server
-		String encryptedPasswordAttempt = hasher.encrypt(passwordAttempt);
+		String encryptedPasswordAttempt =  Encryption.hash(passwordAttempt);
 
 		//authenticate this user and set the loggedIn flag
 		return loggedIn = UserDAO.authenticate(this, encryptedPasswordAttempt);
@@ -122,7 +108,6 @@ public class User implements ConversationListener{
 
 		}
 	}
-
 
 
 	/**
@@ -170,7 +155,7 @@ public class User implements ConversationListener{
 	 * @param password
 	 */
 	public void createUser(String password) {
-		String encryptedPassword = hasher.encrypt(password);
+		String encryptedPassword = Encryption.hash(password);
 		UserDAO.createUser(id, encryptedPassword);
 		UserDAO.registerNewPublicKey(this);
 	}
@@ -182,7 +167,7 @@ public class User implements ConversationListener{
 	public boolean deleteUser(String password) {
 
 		boolean success = false;
-		if(UserDAO.authenticate(this, hasher.encrypt(password))) {
+		if(UserDAO.authenticate(this, Encryption.hash(password))) {
 			this.loggedIn = false;
 			success = UserDAO.deleteUser(id);
 		}
@@ -204,8 +189,7 @@ public class User implements ConversationListener{
 	 * @return
 	 */
 	public String getPublicKey() {
-		EncrypterIF encrypter = EncrypterBuilder.getInstance().getDefaultEncrypter();
-		return encrypter.getPublicKey()[0]+" "+encrypter.getPublicKey()[1];
+		return Encryption.getInstance().getPublicKeyString();
 	}
 
 	/**
@@ -224,7 +208,7 @@ public class User implements ConversationListener{
 	 */
 	public void modifyPassword(String newPassword) {
 		if(loggedIn) {
-			String encryptedPassword = hasher.encrypt(newPassword);
+			String encryptedPassword = Encryption.hash(newPassword);
 			UserDAO.modifyPassword(this, encryptedPassword);
 		}	
 	}
@@ -236,8 +220,8 @@ public class User implements ConversationListener{
 	public void changeEncrypter() {
 
 		if(loggedIn) {
-			//get a new encrypter 
-			EncrypterBuilder.getInstance().getNewEncrypter();
+			//get a new keypair 
+			Encryption.getInstance().renewKeyPair();			
 			//change the public key on the DB.
 			UserDAO.registerNewPublicKey(this);
 		}
