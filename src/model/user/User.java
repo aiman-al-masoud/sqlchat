@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import daos.UserDAO;
 import model.conversations.Conversation;
 import model.conversations.ConversationListener;
-import model.conversations.Message;
 import model.encryption.Encryption;
+import model.conversations.messages.Message;
+
 
 /**
  * 

@@ -9,6 +9,9 @@ import io.FileIO;
 import model.user.User;
 import model.user.LocalUser;
 
+import model.conversations.messages.*;
+
+
 /**
  * A Conversation is a collection of Messages exchanged with the same correspondent.
  *
@@ -60,7 +63,7 @@ public class Conversation extends File{
 	 */
 	public void appendMessage(Message message) {
 		messages.add(message);
-		FileIO.append(conversationsDir.getPath()+File.separator+counterpart, message.toString()+"\n");
+		FileIO.append(conversationsDir.getPath()+File.separator+counterpart, message.getPickleString()+"\n");
 		
 		
 		//notify this conversation's listeners
@@ -88,7 +91,7 @@ public class Conversation extends File{
 	private void loadMessages() {
 		Message message = null;
 		for(String messageString : FileIO.read(getPath()).split("\n") ) {
-			if((message = Message.loadMessage(messageString))!=null) {
+			if((message = Messages.loadMessage(messageString))!=null) {
 				messages.add(message);
 			}
 		}
@@ -129,8 +132,7 @@ public class Conversation extends File{
 	 * @param message
 	 */
 	public void sendMessage(String message) {
-		User sender = LocalUser.getInstance().getLocalUser();
-		Message msg = new Message(System.currentTimeMillis(), sender.getId(), message, counterpart);
+		SentMessage msg = new SentMessage(counterpart, message );
 		this.appendMessage(msg);
 		msg.sendMe();
 	}

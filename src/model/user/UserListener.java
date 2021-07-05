@@ -3,7 +3,7 @@ package model.user;
 import java.util.ArrayList;
 
 import model.conversations.Conversation;
-import model.conversations.Message;
+import model.conversations.messages.*;
 
 /**
  * This interface is meant to be implemented by 

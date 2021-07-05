@@ -7,7 +7,7 @@ import daos.UserDAO;
 import io.ConnectionToDB;
 import model.conversations.Conversation;
 import model.conversations.ConversationManager;
-import model.conversations.Message;
+import model.conversations.messages.*;
 import model.user.User;
 import model.user.UserListener;
 import view.abstrct.UserPrompt;

@@ -1,6 +1,8 @@
 package daos;
 
 import java.sql.Connection;
+
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,7 +11,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import io.ConnectionToDB;
-import model.conversations.Message;
+import model.conversations.messages.*;
+import model.conversations.messages.SentMessage;
 import model.user.User;
 
 public class MessageDAO {
@@ -24,11 +27,17 @@ public class MessageDAO {
 	 * @param sender
 	 * @param message
 	 */
-	public static void messageUser(String recipient, String senderId, String message) {
+	public static void sendMessage(SentMessage message) {
 
-		long unixTime = System.currentTimeMillis(); 
-		String recipientId = recipient;
-
+		
+		//get the fields from the message object.
+		long unixTime = message.getTimestamp();
+		String recipientId = message.getRecipientId();
+		String senderId = message.getSenderId();
+		String messageContent  = message.getEncryptedMessage();
+		String messageHash = message.getMessageHash();
+		
+		
 
 		//if the recipientId contains spaces, stop everything as it could be a sql injection
 		if(recipientId.split("\\s+").length>1) {
@@ -38,13 +47,14 @@ public class MessageDAO {
 
 		try {
 			connection = ConnectionToDB.startConnection();
-			String sql ="INSERT INTO "+recipientId+" (`timestamp`, `senderId`, `message`)\n"
-					+ "VALUES (?, ?, ?);\n";
+			String sql ="INSERT INTO "+recipientId+" (`timestamp`, `senderId`, `message`, `messageHash`)\n"
+					+ "VALUES (?, ?, ?, ?);\n";
 
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setLong(1, unixTime);
 			preparedStatement.setString(2, senderId);
-			preparedStatement.setString(3, message);
+			preparedStatement.setString(3, messageContent);
+			preparedStatement.setString(4, messageHash);
 
 			preparedStatement.execute();
 
@@ -52,8 +62,6 @@ public class MessageDAO {
 			e.printStackTrace();
 		}
 	}
-
-
 
 
 	/**
@@ -77,10 +85,14 @@ public class MessageDAO {
 
 			ResultSet resultSet = statement.executeQuery(MessageFormat.format(sql, recipientId)); 
 
+			//one record for each iteration of the loop
 			while(resultSet.next()) {
-				//one record for each iteration of the loop
-				//starts counting from 1 onwards!!
-				result.add(new Message(Long.parseLong(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(3), recipient.getId()));
+				
+							
+				//build a ReceivedMessage and decipher it for the local user 
+				ReceivedMessage msg = new ReceivedMessage(Long.parseLong(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4));
+				msg.decipherMe();
+				result.add(msg);
 			}
 
 			//delete all messages from the mail-box table
@@ -96,10 +108,6 @@ public class MessageDAO {
 
 		return result;
 	}
-
-
-
-
 
 
 }

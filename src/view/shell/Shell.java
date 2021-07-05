@@ -9,7 +9,7 @@ import controller.Session;
 import controller.SessionServices;
 import io.FileIO;
 import model.conversations.Conversation;
-import model.conversations.Message;
+import model.conversations.messages.*;
 import view.abstrct.AbstractUI;
 
 /**
@@ -104,7 +104,7 @@ public class Shell extends AbstractUI{
 	@Override
 	public void printMessages(ArrayList<Message> messages) {
 		for(Message message : messages) {
-			System.out.println(message.prettyToString());
+			System.out.println(message.getPrettyString());
 		}
 	}
 

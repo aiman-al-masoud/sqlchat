@@ -1,6 +1,7 @@
 package model.conversations;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -8,6 +9,8 @@ import java.util.TimerTask;
 
 import daos.MessageDAO;
 import model.user.LocalUser;
+
+import model.conversations.messages.*;
 
 
 public class ConversationManager {
@@ -91,7 +94,7 @@ public class ConversationManager {
 
 	public void archiveMessages(ArrayList<Message> messages) {
 		for(Message message : messages) {
-			getConversation(message.getSender()).appendMessage(message);
+			getConversation(message.getSenderId()).appendMessage(message);
 		}
 	}
 
@@ -104,11 +107,6 @@ public class ConversationManager {
 
 		//pull this user's raw incoming messages, and removes them from the server.
 		ArrayList<Message> incomingMessages = MessageDAO.pullMessages(LocalUser.getInstance().getLocalUser());
-
-		//decipher the messages with the local User's private key.
-		for(Message message : incomingMessages) {
-			message.decipherForMe();
-		}
 
 		//store the received messages in their respective conversations
 		archiveMessages(incomingMessages);
@@ -150,12 +148,6 @@ public class ConversationManager {
 
 		}
 	}
-
-
-
-
-
-
 
 
 }

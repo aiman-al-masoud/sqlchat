@@ -60,7 +60,7 @@ public class ConnectionToDB {
 	 * Tries to return an active connection to the DB.
 	 * @return
 	 */
-	public static Connection startConnection() {
+	public synchronized static Connection startConnection() {
 		
 		//if connection is not null, don't touch it
 		if(isOpen()) {
