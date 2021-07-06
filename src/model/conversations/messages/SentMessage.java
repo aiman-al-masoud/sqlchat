@@ -20,6 +20,12 @@ public class SentMessage extends AbstractMessage {
 	
 	String YOU = "you";
 	
+	
+	/**
+	 * Constructor for new messages to be sent.
+	 * @param recipientId
+	 * @param message
+	 */
 	public SentMessage(String recipientId, String message) {
 		this.recipientId = recipientId;
 		this.message = message;
@@ -34,6 +40,12 @@ public class SentMessage extends AbstractMessage {
 		this.type = MessageTypes.SENT;
 	}
 	
+	/**
+	 * Construtor for old messages to be loaded from disk.
+	 * @param timestamp
+	 * @param recipientId
+	 * @param message
+	 */
 	public SentMessage(long timestamp, String recipientId, String message) {
 		this(recipientId, message);
 		this.timestamp = timestamp;

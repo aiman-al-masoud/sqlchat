@@ -91,7 +91,6 @@ public class MessageDAO {
 							
 				//build a ReceivedMessage and decipher it for the local user 
 				ReceivedMessage msg = new ReceivedMessage(Long.parseLong(resultSet.getString(1)), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4));
-				msg.decipherMe();
 				result.add(msg);
 			}
 

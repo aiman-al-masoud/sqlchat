@@ -21,8 +21,15 @@ public class ReceivedMessage extends AbstractMessage {
 	Boolean verified = null;
 
 
-	public ReceivedMessage(long timestamp, String senderId, String message, String messageHash) {
-
+	
+	/**
+	 * Common part of the two constructors
+	 * @param timestamp
+	 * @param senderId
+	 * @param message
+	 * @param messageHash
+	 */
+	private void construct(long timestamp, String senderId , String message, String messageHash) {
 		this.timestamp = timestamp;
 		this.senderId = senderId;
 		this.message = message;
@@ -30,14 +37,22 @@ public class ReceivedMessage extends AbstractMessage {
 		this.type = MessageTypes.RECEIVED;
 		this.recipientId = LocalUser.getInstance().getLocalUser().getId();
 	}
-
+	
+	
+	/**
+	 * Constructor to be called for newly arrived messages
+	 */
+	public ReceivedMessage(long timestamp, String senderId, String message, String messageHash) {
+		construct(timestamp, senderId, message, messageHash);
+		this.decipherMe();
+	}
 
 
 	/**
 	 * Alternate constructor for loading a stored ReceivedMessage back to memory from disk.
 	 */
 	public ReceivedMessage(long timestamp, String senderId, String message, String messageHash, boolean verified) {
-		this(timestamp,senderId, message, messageHash);
+		construct(timestamp, senderId, message, messageHash);
 		this.verified = verified;
 	}
 
@@ -78,18 +93,6 @@ public class ReceivedMessage extends AbstractMessage {
 
 		return verified;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
