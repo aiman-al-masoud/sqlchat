@@ -3,7 +3,7 @@ package view.abstrct;
 import java.util.ArrayList;
 
 import controller.Session;
-import controller.SessionListener;
+import view.interfaces.UserInterface;
 
 
 
@@ -18,7 +18,7 @@ import controller.SessionListener;
  * and send them back to the Session when they're all ready.
  *
  */
-public abstract class AbstractUI implements SessionListener {
+public abstract class AbstractUI implements UserInterface {
 
 	
 	/**

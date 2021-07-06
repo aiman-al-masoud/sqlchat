@@ -1,4 +1,4 @@
-package controller;
+package view.interfaces;
 
 import java.util.ArrayList;
 
@@ -7,9 +7,11 @@ import model.conversations.messages.*;
 import view.abstrct.UserPrompt;
 
 /**
- * Has to be implemented by any User interface.
+ * 
+ * This interface has to be implemented by any user interface that is controlled by Session.
+ * 
  */
-public interface SessionListener{
+public interface UserInterface{
 
 	public void displayHelp();
 	public void listConversations(ArrayList<Conversation> conversations);

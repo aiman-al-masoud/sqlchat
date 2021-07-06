@@ -30,4 +30,6 @@ LSU: lists all of the registered accounts on the server.
 
 CLS: clears the screen.
 
+CHUI: hot-swap the UI by providing the path to a jar file containing an implementation of the 'UserInterface' interface. 
+
 ----------------------------------------------------

@@ -11,6 +11,8 @@ import model.conversations.messages.*;
 import model.user.User;
 import model.user.UserListener;
 import view.abstrct.UserPrompt;
+import view.interfaces.UserInterface;
+import view.reflection.UserInterfaceLoader;
 import model.user.LocalUser;
 
 
@@ -33,7 +35,7 @@ public class Session implements UserListener{
 	 * The listeners that obeys this Session.
 	 * (Probably User Interface Objects)
 	 */
-	SessionListener userInterface;
+	UserInterface userInterface;
 
 
 	/**
@@ -45,7 +47,7 @@ public class Session implements UserListener{
 	 * Adds a new listener.
 	 * @param listener
 	 */
-	public void addListener(SessionListener listener) {
+	public void addListener(UserInterface listener) {
 		this.userInterface = listener;
 	}
 
@@ -53,7 +55,7 @@ public class Session implements UserListener{
 	 * Removes a new listener.
 	 * @param listener
 	 */
-	public void removeListener(SessionListener listener) {
+	public void removeListener(UserInterface listener) {
 		this.userInterface = null;
 	}
 
@@ -160,7 +162,31 @@ public class Session implements UserListener{
 			if(localUser!=null) {
 				localUser.logout();
 			}	
-			break;	
+		
+			break;
+			
+			
+		case CHUI:
+			
+			
+			if(args.length<1) {
+				userInterface.userMessage("Please provide a path to a jar!");
+				return;
+			}
+			
+			String jarpath = args[0];
+			UserInterface ui = UserInterfaceLoader.load(jarpath);
+			
+			if(ui==null) {
+				userInterface.userMessage("No suitable implementation of 'UserInterface' found!");
+				return;
+			}
+			
+			addListener(ui);
+			
+		break;
+			
+			
 		default:
 		case NOTACMD:
 			String wrongCommand = args.length==0 ? "" :args[0]; 

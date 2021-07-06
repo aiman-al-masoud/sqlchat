@@ -25,8 +25,6 @@ public class UserPrompt {
 	
 	
 	
-	
-	
 	/**
 	 * Gets the next prompt in the queue and removes it
 	 * @return
@@ -41,8 +39,6 @@ public class UserPrompt {
 		prompts.remove(0);
 		return buffer;
 	}
-	
-	
 	
 	
 	
