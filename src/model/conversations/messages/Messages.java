@@ -19,6 +19,7 @@ public class Messages {
 		try {
 			String[] parts = pickleString.split(AbstractMessage.SEPARATOR);
 			
+			
 			long timestamp = Long.parseLong(parts[0]);
 			String senderId = parts[1];
 			String message = parts[2];
@@ -30,7 +31,8 @@ public class Messages {
 			switch(MessageTypes.valueOf(type.trim())) {
 			
 			case RECEIVED:
-				return new ReceivedMessage(timestamp, senderId, message, messageHash);
+				String verified = parts[6];
+				return new ReceivedMessage(timestamp, senderId, message, messageHash, verified.equals("true")? true: false );
 			case SENT:	
 				return new SentMessage(timestamp, recipientId, message);	
 			}
@@ -38,9 +40,6 @@ public class Messages {
 		}catch(Exception e) {
 			
 		}
-		
-		
-		
 
 		return null;
 	}
